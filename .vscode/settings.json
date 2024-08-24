@@ -1,0 +1,112 @@
+{
+  "editor.tabSize": 2,
+  "editor.fontSize": 12,
+  "editor.insertSpaces": true,
+  "editor.renderWhitespace": "boundary",
+  "editor.syntaxProfiles": {
+    "typescript": "tsx"
+  },
+  "files.autoSave": "off",
+  "files.trimTrailingWhitespace": true,
+  "editor.dragAndDrop": true,
+  "editor.detectIndentation": true,
+  "editor.minimap.enabled": true,
+  "files.insertFinalNewline": true,
+  "html.format.wrapLineLength": 120,
+  "html.format.indentInnerHtml": true,
+  "html.autoClosingTags": true,
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "editor.wordWrap": "on",
+  "extensions.ignoreRecommendations": true,
+  "gitlens.advanced.messages": {
+    "suppressCommitHasNoPreviousCommitWarning": false,
+    "suppressCommitNotFoundWarning": false,
+    "suppressCreatePullRequestPrompt": false,
+    "suppressDebugLoggingWarning": false,
+    "suppressFileNotUnderSourceControlWarning": false,
+    "suppressGitDisabledWarning": false,
+    "suppressGitMissingWarning": false,
+    "suppressGitVersionWarning": false,
+    "suppressLineUncommittedWarning": false,
+    "suppressNoRepositoryWarning": false,
+    "suppressRebaseSwitchToTextWarning": false,
+    "suppressIntegrationDisconnectedTooManyFailedRequestsWarning": false,
+    "suppressIntegrationRequestFailed500Warning": false,
+    "suppressIntegrationRequestTimedOutWarning": false
+  },
+  "workbench.startupEditor": "readme",
+  "gitlens.keymap": "chorded",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "breadcrumbs.enabled": true,
+  "editor.largeFileOptimizations": false,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "prettier.tabWidth": 2,
+  "gitlens.views.repositories.files.layout": "auto",
+  "editor.autoClosingBrackets": "always",
+  "editor.autoClosingQuotes": "always",
+  "editor.autoIndent": "full",
+  "autoimport.doubleQuotes": false,
+  "autoimport.showNotifications": true,
+  "css.lint.duplicateProperties": "error",
+  "reactSnippets.settings.prettierEnabled": true,
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "emmet.triggerExpansionOnTab": true,
+  "gitlens.gitCommands.closeOnFocusOut": true,
+  "prettier.trailingComma": "all",
+  "prettier.arrowParens": "avoid",
+  "prettier.bracketSpacing": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.run": "onSave",
+  "eslint.validate": [
+    "typescript",
+    "typescriptreact",
+    "javascript",
+    "javascriptreact"
+  ],
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "tailwindCSS.lint.cssConflict": "error",
+  "javascript.format.semicolons": "insert",
+  "javascript.inlayHints.enumMemberValues.enabled": true,
+  "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "javascript.inlayHints.parameterTypes.enabled": true,
+  "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.format.insertSpaceAfterConstructor": true,
+  "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.suggest.completeFunctionCalls": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "editor.language.brackets": [],
+  "editor.indentSize": "tabSize",
+}
