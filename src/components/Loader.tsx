@@ -8,7 +8,7 @@ export interface LoaderProps {
   type?: 'Loading' | 'Wait' | 'Search'
 }
 
-export const Loader: FC<LoaderProps> = ({ height, width, color, type = 'Loading' }: LoaderProps) => {
+export const Loader: FC<LoaderProps> = ({ height, width, color = '#264653', type = 'Loading' }: LoaderProps) => {
   if (type === 'Loading') {
     return (
       <>

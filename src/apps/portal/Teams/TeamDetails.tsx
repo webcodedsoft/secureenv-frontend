@@ -102,7 +102,7 @@ export default function TeamDetails() {
                 <input className="custom-radio" type="radio" name="radio-2" defaultChecked />
                 <div className='flex flex-col gap-y-2'>
                   Contributor
-                  <span className='text-xs'>Contributors have a more involved role within the organization, allowing them to actively participate in the development and management of projects they are associated with. However, their permissions are still controlled to prevent unauthorized actions.</span>
+                  <span className='text-xs'>Contributors have a more involved role within the workspace, allowing them to actively participate in the development and management of projects they are associated with. However, their permissions are still controlled to prevent unauthorized actions.</span>
                 </div>
               </label>
               <div className="px-5">
@@ -112,7 +112,7 @@ export default function TeamDetails() {
                 <input className="custom-radio" type="radio" name="radio-2" />
                 <div className='flex flex-col gap-y-2'>
                   Viewer
-                  <span className='text-xs'>Viewers have a limited access role within the organization. They are restricted to a <span className='text-red'>“read-only”</span> mode, meaning they can only view projects to which they have been explicitly invited.</span>
+                  <span className='text-xs'>Viewers have a limited access role within the workspace. They are restricted to a <span className='text-red'>“read-only”</span> mode, meaning they can only view projects to which they have been explicitly invited.</span>
                 </div>
               </label>
               <div className="px-5">
@@ -122,7 +122,7 @@ export default function TeamDetails() {
                 <input className="custom-radio" type="radio" name="radio-2" />
                 <div className='flex flex-col gap-y-2'>
                   Admin
-                  <span className='text-xs'>Admins hold the highest level of access within the organization. They have comprehensive control over both projects and organizational settings, giving them the authority to manage all aspects of the organization.</span>
+                  <span className='text-xs'>Admins hold the highest level of access within the workspace. They have comprehensive control over both projects and workspace settings, giving them the authority to manage all aspects of the workspace.</span>
                 </div>
               </label>
             </div>

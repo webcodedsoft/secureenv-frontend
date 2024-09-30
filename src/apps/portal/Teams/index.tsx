@@ -1,18 +1,295 @@
-import Button from 'components/Forms/Button';
+import Button, { ButtonProps } from 'components/Forms/Button';
 import withCreatePortal from 'components/HOC/withCreatePortal';
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import AddTeamModal from './AddTeamModal';
 import Filter from 'components/Filter';
 import TextField from 'components/Forms/TextField';
-import Dropdown from 'components/Dropdown';
 import { Icon, Icons } from 'components/Icon';
-import useDarkMode from 'common/hooks/useDarkMode';
+import { useDeleteTeamMember, useGetTeamList } from 'common/queries-and-mutations/team';
+import { useSearchParams } from 'react-router-dom';
+import { selectAccountDetails } from 'selectors/account-selector';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import useDebounce from 'common/hooks/useDebounce';
+import { ListOrder, PaginatedListMeta } from 'types/general.type';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from '@tanstack/react-table'
+import { TeamDaum } from 'services/dtos/team.dto';
+import AvatarInitial from 'components/Avatar/Initial';
+import { format } from 'date-fns';
+import { Loader } from 'components/Loader';
+import clsx from 'clsx';
+import Paginator from 'components/Table/TableWidget/Paginator';
+import { AccountStatus, RolesEnum } from 'types/user.type';
+import ConfirmModal from 'components/Modal/ConfirmModal';
+import { logout } from 'thunks/account-thunk';
+import { toast } from 'react-toastify';
+import { Alert } from 'components/Toast';
 
 const EhancedAddTeamModal = withCreatePortal(AddTeamModal);
-
+const EhanchedConfirm = withCreatePortal(ConfirmModal);
 export default function ManageTeam() {
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const isDarkMode = useDarkMode()
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [urlParams, setUrlParams] = useSearchParams()
+  const [isExecutingSearch, setIsExecutingSearch] = useState<boolean>(true)
+  const searchQueryString = urlParams.get('search_query') ?? ''
+  const currentPage = urlParams.get('page') ?? '1'
+  const numberOfItemsPerPage = urlParams.get('items_per_page') || 10
+  const status = urlParams.get('status') || 'ALL'
+  const { user } = useAppSelector(selectAccountDetails)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [removedUserId, setRemovedUserId] = useState<null | number>()
+  const dispatch = useAppDispatch();
+  const { mutate, isSuccess, isError } = useDeleteTeamMember()
+
+  const debounceSearch = useDebounce(searchQueryString, 1300)
+
+  const getPaginationParams = useCallback(() => {
+    return {
+      page: +currentPage,
+      take: +numberOfItemsPerPage,
+      order: ListOrder.DESC,
+    }
+  }, [currentPage, numberOfItemsPerPage])
+
+  const computedWhereOptions = useCallback(() => {
+    const trimmedSearch = searchQueryString.trim()
+    if (trimmedSearch.length > 2) {
+      return {
+        search_query: trimmedSearch,
+        status,
+      }
+    }
+    return {
+      search_query: '',
+      status,
+    }
+  }, [searchQueryString, status])
+
+  const {
+    data: teamList,
+    isFetching,
+    refetch,
+  } = useGetTeamList({
+    whereOptions: computedWhereOptions(),
+    paginationOptions: getPaginationParams(),
+    enabled: isExecutingSearch,
+  })
+
+  useEffect(() => {
+    if (!isFetching && isExecutingSearch) {
+      setIsExecutingSearch(false)
+    }
+  }, [isFetching, isExecutingSearch])
+
+  useEffect(() => {
+    if (debounceSearch.length > 3) {
+      setIsExecutingSearch(true)
+      refetch()
+    }
+  }, [debounceSearch, refetch])
+
+
+  const columnHelper = createColumnHelper<TeamDaum>()
+
+  const determineActionBtn = (member: TeamDaum) => {
+    const isCurrentUser = user.id === member.id;
+    const isAdmin = user.accountRole === RolesEnum.ADMIN;
+
+    const buttonProps: ButtonProps = {
+      type: "button",
+      variant: "outline",
+      size: "sm",
+      className: `rounded-md text-base w-32 ${isCurrentUser ? "text-white bg-red" : "text-red"}`,
+      label: isCurrentUser ? "Leave" : "Remove",
+      onClick: () => {
+        setShowConfirmModal(true)
+        setRemovedUserId(member.id)
+      },
+      icon: (
+        <Icon
+          name={Icons.Cancel}
+          fill={isCurrentUser ? "#FFFFFF" : "#e23738"}
+        />
+      ),
+    };
+
+    return (isAdmin || isCurrentUser) && <Button {...buttonProps} />;
+  };
+
+  const columns = [
+    columnHelper.accessor((row) => row.name, {
+      enableSorting: true,
+      id: 'name',
+      cell: (info) => (
+        <div className='flex items-center gap-2'>
+          <div className="rounded-full overflow-hidden">
+            <AvatarInitial
+              name={info.row.original.accountStatus === AccountStatus.ACTIVATED ? info.getValue() : info.row.original.accountStatus}
+              avatarColor={info.row.original.avatarColor}
+              className="w-10 h-10"
+            />
+          </div>
+          <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">
+            {info.row.original.accountStatus === AccountStatus.ACTIVATED ? info.getValue() : info.row.original.accountStatus}
+          </p>
+        </div>
+      ),
+      header: () => <span className="text-xs font-semibold text-[#848484]">Name</span>,
+    }),
+    columnHelper.accessor((row) => row.emailAddress, {
+      enableSorting: true,
+      id: 'emailAddress',
+      cell: (info) => <span className="text-xs font-normal">{info.getValue()}</span>,
+      header: () => <span className="text-xs font-semibold text-[#848484]">Email Address</span>,
+    }),
+    columnHelper.accessor((row) => row.accountRole, {
+      enableSorting: true,
+      id: 'accountRole',
+      cell: (info) => <span className="text-xs font-normal">{info.getValue()}</span>,
+      header: () => <span className="text-xs font-semibold text-[#848484]">Role</span>,
+    }),
+    columnHelper.accessor((row) => row.accountStatus, {
+      enableSorting: true,
+      id: 'accountStatus',
+      cell: (info) => (
+        <span className="text-gray-1100 text-xs dark:text-gray-dark-1100">
+          <div className="flex items-center gap-x-2">
+            <div className={`w-2 h-2 rounded-full ${info.getValue() === AccountStatus.ACTIVATED ? 'bg-green' : 'bg-red'}`}></div>
+            <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">{info.getValue()}</p>
+          </div>
+        </span>
+      ),
+      header: () => <span className="text-xs font-semibold text-[#848484]">Status</span>,
+    }),
+    columnHelper.accessor((row) => row.createdAt, {
+      enableSorting: false,
+      id: 'createdAt',
+      cell: (info) => <span className="text-xs font-normal">{format(new Date(info.getValue()), 'dd MMM yyyy')}</span>,
+      header: () => <span className="text-xs font-semibold text-[#848484]">Date Added</span>,
+    }),
+    columnHelper.accessor((row) => row.id, {
+      enableSorting: false,
+      id: 'id',
+      cell: (info) => (
+        <div>
+          {determineActionBtn(info.row.original)}
+        </div>
+      ),
+      header: () => <span className="text-xs font-semibold text-[#848484]">Action</span>,
+    }),
+  ]
+
+  const data = useMemo<TeamDaum[]>(() => {
+    const normalizedResult: TeamDaum[] = (teamList?.data ?? []).map((item) => item)
+    return normalizedResult
+  }, [teamList])
+
+  const listMetaData = (teamList?.meta ?? {}) as PaginatedListMeta
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+    },
+    // initialState: {
+    //   pagination: {
+    //     pageSize: 2
+    //   }
+    // },
+    getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  })
+
+  const handleFilter = (currentTab: string) => {
+    if (currentTab === 'ALL') {
+      urlParams.delete('status')
+      setUrlParams(urlParams)
+    }
+    urlParams.set('status', currentTab)
+    setUrlParams(urlParams)
+    setIsExecutingSearch(true)
+    refetch()
+  }
+
+  const handleChange = (e: React.ChangeEvent<any>) => {
+    const { name, value } = e.target
+    if (value.trim() === '') {
+      urlParams.delete(name)
+      setUrlParams(urlParams)
+    }
+    if (value.trim()) {
+      urlParams.set(name, value)
+      setUrlParams(urlParams)
+    }
+  }
+
+  const goToNextPage = () => {
+    if (currentPage && urlParams && setUrlParams) {
+      const nextPageValue = currentPage ? `${+currentPage + 1}` : '2'
+      urlParams.set('page', nextPageValue)
+      setUrlParams(urlParams)
+    }
+  }
+
+  const goToPreviousPage = () => {
+    if (currentPage && +currentPage > 1 && urlParams && setUrlParams) {
+      const previousPageValue = `${+currentPage - 1}`
+      urlParams.set('page', previousPageValue)
+      setUrlParams(urlParams)
+    }
+  }
+
+  const handleRemove = () => {
+    setIsSubmitting(true)
+    mutate({ userId: removedUserId! })
+  }
+
+  useEffect(() => {
+    if (isSuccess && !isError) {
+      setIsSubmitting(false)
+      setShowConfirmModal(false)
+      setRemovedUserId(null)
+      refetch()
+      toast(<Alert type="success" message="Account successfully removed" />)
+      if (user.id === removedUserId) {
+        dispatch(logout())
+      }
+    } else if (!isError) {
+      setIsSubmitting(false)
+    }
+  }, [isSuccess, isError])
+
+  const modalText = useMemo(() => {
+    const isCurrentUser = removedUserId === user.id;
+    return {
+      title: isCurrentUser
+        ? "Are you absolutely sure you want to delete your account? 🛑"
+        : "Are you absolutely sure you want to delete this user's account? 🛑",
+      content: isCurrentUser
+        ? "Warning: This is a one-way trip! Hit the delete button, and poof—your data’s gone forever, and there’s no turning back. Still want to go through with it?"
+        : "Careful now! Once you delete this, it’s like the user's account data went on vacation and forgot to come back—no logging in, no take-backs. Are you sure?",
+    };
+  }, [removedUserId]);
+
+  if (isFetching) {
+    return (
+      <div className="mt-40 flex flex-col items-center justify-center">
+        <Loader height={50} width={50} />
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -35,25 +312,28 @@ export default function ManageTeam() {
           </div>
         </div>
         <div className="flex items-center justify-between gap-5 mb-[27px]">
-          <div className="flex items-center gap-3">
-            <Filter label={'Filters'} options={
-              [
-                { value: 'VIEWER', label: 'Viewer' },
-                { value: 'CONTRIBUTOR', label: 'Contributor' }
-              ]
-            } onSelect={(val) => { }} />
-          </div>
           <TextField
-            name="searchQuery"
+            name="search_query"
             placeholder="Search team"
             label=""
             size="md"
             className="w-44s"
             isRequired
             type="search"
-            value=""
-            onChange={() => { }}
+            value={searchQueryString}
+            onChange={handleChange}
           />
+          <div className="flex items-center gap-3">
+            <Filter
+              label={'Filters'}
+              options={[
+                { value: 'ALL', label: 'All' },
+                { value: RolesEnum.VIEWER, label: 'Viewer' },
+                { value: RolesEnum.COLLABORATOR, label: 'Collaborator' },
+                { value: RolesEnum.ADMIN, label: 'Admin' }
+              ]}
+              onSelect={(val) => handleFilter(val)} />
+          </div>
         </div>
         <div className="rounded-2xl border border-neutral bg-neutral-bg dark:border-dark-neutral-border dark:bg-dark-neutral-bg overflow-x-scroll scrollbar-hide p-[25px] mb-[25px]">
           <div className="flex items-center justify-between pb-4 border-neutral border-b mb-3 dark:border-dark-neutral-border">
@@ -62,93 +342,67 @@ export default function ManageTeam() {
             </p>
           </div>
           <table className="w-full min-w-[900px]">
-            <tbody>
-              <tr className="border-b text-normal text-gray-1100 border-neutral dark:border-dark-neutral-border dark:text-gray-dark-1100">
-                <td className="py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full overflow-hidden">
-                      <img
-                        src="assets/images/seller-avatar-1.png"
-                        alt="user avatar"
-                      />
-                    </div>
-                    <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">
-                      Bessie Cooper
-                    </p>
-                  </div>
-                </td>
-                <td>
-                  <span>tim.jennings@site.com</span>
-                </td>
-                <td>
-                  <div className="flex items-center gap-x-2">
-                    <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">
-                      Viewer
-                    </p>
-                  </div>
-                </td>
-                <td>
-                  <span>28 Jan 2022</span>
-                </td>
-                <td>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="rounded-md text-base text-white bg-red w-32"
-                    label="Leave"
-                    onClick={() => setShowInviteModal(true)}
-                    icon={<Icon name={Icons.Cancel} fill='#FFFFFF' />}
-                  ></Button>
-                </td>
-              </tr>
-              <tr className="border-b text-normal text-gray-1100 border-neutral dark:border-dark-neutral-border dark:text-gray-dark-1100">
-                <td className="py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full overflow-hidden">
-                      <img
-                        src="assets/images/seller-avatar-1.png"
-                        alt="user avatar"
-                      />
-                    </div>
-                    <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">
-                      Bessie Cooper
-                    </p>
-                  </div>
-                </td>
-                <td>
-                  <span>tim.jennings@site.com</span>
-                </td>
-                <td>
-                  <div className="flex items-center gap-x-2">
-                    <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">
-                      Viewer
-                    </p>
-                  </div>
-                </td>
-                <td>
-                  <span>28 Jan 2022</span>
-                </td>
-                <td>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="rounded-md text-base text-red w-32"
-                    label="Remove"
-                    onClick={() => setShowInviteModal(true)}
-                    icon={<Icon name={Icons.Cancel} fill={'#e23738'} />}
-                  ></Button>
-                </td>
-              </tr>
-            </tbody>
+            {table.getRowModel().rows.length >= 1 && (
+              <tbody className="">
+                {table.getRowModel().rows.map((row, cellIndex) => (
+                  <tr key={row.id} className="border-b text-normal text-gray-1100 border-neutral dark:border-dark-neutral-border dark:text-gray-dark-1100">
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={clsx({
+                          'py-3': true,
+                          // [className]: className,
+                        })}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
+          {table.getRowModel().rows.length === 0 && (
+            <p className="mx-auto my-10 flex w-full flex-col items-center justify-center text-xl font-bold text-gray-1100 dark:text-gray-dark-1100">
+              No team added yet
+            </p>
+          )}
+          <div className="mt-5 p-5">
+            <Paginator
+              numberOfPages={listMetaData.pageCount}
+              page={+currentPage}
+              hasNext={listMetaData.hasNextPage}
+              hasPrevious={listMetaData.hasPreviousPage}
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+              numberOfItemsPerPage={10}
+              setNumberOfItemsPerPage={(items_per_page) => {
+                urlParams.set('items_per_page', items_per_page.toString())
+                setUrlParams(urlParams)
+                setIsExecutingSearch(true)
+              }}
+            />
+          </div>
         </div>
 
       </div>
       {showInviteModal && (
         <EhancedAddTeamModal onClose={() => setShowInviteModal(false)} />
+      )}
+
+      {showConfirmModal && removedUserId && (
+        <EhanchedConfirm
+          title={modalText.title}
+          content={modalText.content}
+          actionText="No"
+          cancelText="Yes, please"
+          onConfirm={() => {
+            setShowConfirmModal(false)
+            setRemovedUserId(null)
+          }}
+          onCancel={handleRemove}
+          isSubmitting={isSubmitting}
+        />
       )}
     </div>
   )

@@ -31,16 +31,6 @@ class AuthService {
     }
   }
 
-  fetchUserInformation = async () => {
-    try {
-      const response = await this.baseService.get('users/user')
-      return response?.data
-    } catch (error: any) {
-      const err = error as AxiosError<Error>
-      return errorHandler(err)
-    }
-  }
-
   checkIfEmailInUse = async (emailAddress: string) => {
     try {
       const response = await this.baseService.post('/authentication/email-exists', { emailAddress })
@@ -99,6 +89,12 @@ class AuthService {
       const err = error as AxiosError<Error>
       return errorHandler(err)
     }
+  }
+
+
+  authenticate = async () => {
+    const response = await this.baseService.get('/user/validate-auth')
+    return response?.data
   }
 }
 

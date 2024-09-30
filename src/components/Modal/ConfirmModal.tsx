@@ -1,5 +1,3 @@
-import logo from '@assets/images/leadway-logo.png'
-
 import Button from '../Forms/Button'
 import { Icon, Icons } from '../Icon'
 import { InfoModal } from './InfoModal'
@@ -11,9 +9,7 @@ type Props = {
   cancelText?: string
   onConfirm: () => void
   onCancel: () => void
-  onClose?: () => void
   isSubmitting?: boolean
-  bgColor?: string
   className?: string
 }
 
@@ -24,50 +20,42 @@ export default function ConfirmModal({
   cancelText,
   onConfirm,
   onCancel,
-  onClose,
   isSubmitting,
-  bgColor,
-  className = 'md:w-[40%] sm:w-[30%]',
+  className = 'md:w-[30%] sm:w-[20%]',
 }: Props) {
   return (
     <InfoModal width={`${className}`} className="h-fit rounded-md pb-5">
       <div className="flex flex-col items-center justify-between rounded-lg bg-white font-circular text-2xl font-bold text-[#353535]">
-        <div className="flex w-full items-center justify-between gap-4 rounded-t bg-[#DEDEDE] p-2 px-4">
+        <div className="flex w-full items-center justify-between gap-4 rounded-t bg-white p-2">
           <div className="flex w-full items-center gap-4">
-            <img src={logo} className="size-10" />
-            <p className="border-l-2 pl-3 text-base text-primary-900" style={{ color: bgColor }}>
+            <p className="border-l-2 border-r-2 px-3 text-base text-color-brands">
               {title}
             </p>
           </div>
-          {onClose && (
-            <div className="justify-end" role="button" onClick={onClose} tabIndex={-1} onKeyDown={onClose}>
-              <Icon name={Icons.Cancel} fill={bgColor} />
-            </div>
-          )}
         </div>
         <div className="px-8">
-          <p className="mt-5 text-base">{content}</p>
-          <div className="my-3 mt-10 flex w-full items-center justify-end gap-3">
-            <Button
-              variant="outline"
-              size="md"
-              className="w-full rounded text-sm font-normal"
-              label={cancelText || 'No'}
-              onClick={onCancel}
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              bgColor={bgColor}
-            ></Button>
-            <Button
-              variant="primary"
-              size="md"
-              className="w-full rounded text-sm font-normal"
-              label={actionText || 'Yes'}
-              onClick={onConfirm}
-              disabled={isSubmitting}
-              loading={isSubmitting}
-              bgColor={bgColor}
-            ></Button>
+          <p className="mt-5 text-base" dangerouslySetInnerHTML={{ __html: content }} />
+          <div className='pb-4'>
+            <div className="my-3 mt-10 flex items-center justify-end gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded text-sm font-normal w-32 hover:bg-transparent"
+                label={cancelText || 'No'}
+                onClick={onCancel}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              ></Button>
+              <Button
+                variant="primary"
+                size="sm"
+                className="rounded text-sm font-normal w-32"
+                label={actionText || 'Yes'}
+                onClick={onConfirm}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              ></Button>
+            </div>
           </div>
         </div>
       </div>

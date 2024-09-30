@@ -1,14 +1,15 @@
 import Button from 'components/Forms/Button'
-import { Icon, Icons } from 'components/Icon'
-import React from 'react'
 import PasswordSetting from './PasswordSetting'
 import ProfileSettings from './ProfileSettings'
 import TwoFASettings from './TwoFASettings'
 import BasicDetails from './BasicDetails'
-import OrgSettings from './OrgSettings'
 import DeleteAccount from './DeleteAccount'
+import { useAppSelector } from 'store/hooks'
+import { selectAccountDetails } from 'selectors/account-selector'
 
 export default function Settings() {
+  const { user } = useAppSelector(selectAccountDetails);
+
   return (
     <div>
       <div className='flex items-center justify-between'>
@@ -25,14 +26,13 @@ export default function Settings() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="flex flex-col flex-1 gap-y-7">
-          <ProfileSettings />
-          <OrgSettings />
+          <ProfileSettings user={user} />
+          <DeleteAccount user={user} />
         </div>
         <div className="flex flex-col flex-1 gap-y-5">
-          <BasicDetails />
-          <PasswordSetting />
-          <TwoFASettings />
-          <DeleteAccount />
+          <BasicDetails user={user} />
+          <PasswordSetting user={user} />
+          <TwoFASettings user={user} />
         </div>
       </div>
     </div>

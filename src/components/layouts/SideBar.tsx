@@ -9,7 +9,7 @@ import { portalNavs } from 'constants/nav'
 import { determinePathName } from 'utils'
 import { IUserNav } from 'types/INav.type'
 
-export default function SideBar({ orgId }: { orgId: string }) {
+export default function SideBar({ orgId, isCompany }: { orgId: string, isCompany: boolean }) {
   const { pathname } = useLocation()
 
   const determineMenu = (item: IUserNav) => {
@@ -45,8 +45,8 @@ export default function SideBar({ orgId }: { orgId: string }) {
           <div className="hidden peer-checked:block">
             <ul className="text-gray-300 child-menu z-10 pl-[53px]">
               {item.child?.map((ch) => (
-                <li className="pb-2 transition-opacity duration-150 hover:opacity-75" key={ch.path}>
-                  <Link className="text-normal" to={`/organization/${orgId}${ch.path}`}>
+                <li className="pb-2 transition-opacity duration-150 hover:opacity-75" key={ch.id}>
+                  <Link className="text-normal" to={`/workspace/${orgId}${ch.path}`}>
                     {ch.name}
                   </Link>
                 </li>
@@ -60,7 +60,7 @@ export default function SideBar({ orgId }: { orgId: string }) {
         <div
           className="flex items-center justify-between w-full cursor-pointer py-[17px] px-[21px] focus:outline-none peer-checked:border-transparent"
         >
-          <Link to={`/organization/${orgId}${item.path}`} className="flex items-center gap-[10px]">
+          <Link to={`/workspace/${orgId}${item.path}`} className="flex items-center gap-[10px]">
             <img
               src={item.icon}
               alt="side menu icon"
@@ -74,6 +74,15 @@ export default function SideBar({ orgId }: { orgId: string }) {
     }
   }
 
+  const predicate = (item: IUserNav) => {
+    if (isCompany) {
+      item.isGeneral = true;
+    } else if (!item.isGeneral) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <aside className="bg-white hidden row-span-2 border-r border-neutral relative md:flex flex-col justify-between p-[25px] dark:bg-dark-neutral-bg dark:border-dark-neutral-border shadow-lg">
       <div>
@@ -85,8 +94,9 @@ export default function SideBar({ orgId }: { orgId: string }) {
           />
         </Link>
         <div className="pt-[106px] lg:pt-[35px] pb-[18px]">
-          {portalNavs.map((item) => (
-            <div key={item.path} className={`sidemenu-item rounded-xl relative ${determinePathName(pathname) === item.main ? 'active' : ''}`}>
+          {portalNavs.filter(predicate).map((item) => (
+            <div key={item.id} className={`sidemenu-item rounded-xl relative
+            ${determinePathName(pathname).includes(item.main) ? 'active' : ''}`}>
               {determineMenu(item)}
             </div>
           ))}

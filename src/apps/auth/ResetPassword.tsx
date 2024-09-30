@@ -54,7 +54,6 @@ export default function ResetPassword() {
     }
   }, [])
 
-
   useEffect(() => {
     if (isSuccess && !isError) {
       setIsSubmitting(false)

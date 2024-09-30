@@ -1,8 +1,11 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Alert } from 'components/Toast'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { services } from 'services'
 import { ResetPasswordDto, SetupDto, ValidateEmailDto } from 'services/dtos/auth.dto'
+import { useAppDispatch } from 'store/hooks'
+import { logout } from 'thunks/account-thunk'
 
 export const useSignUp = () => {
   const queryClient = useQueryClient()
@@ -71,3 +74,18 @@ export const useResetPassword = () => {
     },
   )
 }
+
+export const useUserAuth = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  return useQuery(['user'], services.authService.authenticate, {
+    onError: () => {
+      dispatch(logout());
+      navigate('/auth/login')
+    },
+    retry: false,
+    refetchOnWindowFocus: true
+  })
+}
+

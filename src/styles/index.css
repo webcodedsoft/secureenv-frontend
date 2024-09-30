@@ -611,3 +611,8 @@ html:not(.dark) .minimize .moon-icon {
   font-size: 16px;
   /* Increase label font size */
 }
+
+.highlighted-text {
+  background-color: yellow;
+  color: black;
+}

@@ -30,7 +30,7 @@ export const logout = () => async (dispatch: AppDispatch) => {
 
 export const fetchUserInformation = createAsyncThunk<any, void>('users/user', async (_, { rejectWithValue }) => {
   try {
-    const response = await services.authService.fetchUserInformation()
+    const response = await services.userService.fetchUserInformation()
     return response
   } catch (err) {
     const error = err as AxiosError

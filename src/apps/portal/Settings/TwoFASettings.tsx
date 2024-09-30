@@ -1,8 +1,13 @@
 import useDarkMode from 'common/hooks/useDarkMode'
 import Button from 'components/Forms/Button'
 import { Icon, Icons } from 'components/Icon'
+import { UserInfoDto } from 'services/dtos/user.dto'
 
-export default function TwoFASettings() {
+type IProps = {
+  user: UserInfoDto
+}
+
+export default function TwoFASettings({ user }: IProps) {
   const isDarkMode = useDarkMode()
 
   return (

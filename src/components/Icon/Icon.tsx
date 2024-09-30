@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import { IconProps, Icons } from './interface'
 
-export function Icon({ name, width, height, fill, stroke }: IconProps) {
+export function Icon({ name, width, height, fill, stroke, className }: IconProps) {
   const iconWidth = useMemo(() => width || 24, [width])
   const iconHeight = useMemo(() => height || 24, [height])
 
@@ -36,7 +36,7 @@ export function Icon({ name, width, height, fill, stroke }: IconProps) {
   }
   if (name === Icons.Error) {
     return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width={width ?? "24"} height={height ?? "24"} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clipPath="url(#clip0_3681_21755)">
           <path
             d="M21.5259 18.5L12.8657 3.5C12.4808 2.83333 11.5185 2.83333 11.1336 3.5L2.47336 18.5C2.08846 19.1667 2.56958 20 3.33938 20H20.6599C21.4297 20 21.9108 19.1667 21.5259 18.5Z"
@@ -405,6 +405,224 @@ export function Icon({ name, width, height, fill, stroke }: IconProps) {
         <path d="M2.75 14.6665C2.75 15.519 3.25417 16.289 4.03333 16.6373L10.2575 19.4057C10.7342 19.6165 11.275 19.6165 11.7425 19.4057L17.9667 16.6373C18.7458 16.289 19.25 15.519 19.25 14.6665" stroke={stroke ?? "#8B8B93"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
 
+    )
+  }
+  if (name === Icons.ArrowLeft) {
+    return (
+      <svg width={width ?? 16} height={height ?? 16} viewBox="0 0 24 24" fill={fill ?? "none"} xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.57 5.92999L3.5 12L9.57 18.07" stroke={stroke ?? "#9A9AAF"} strokeWidth="1.5" strokeMiterlimit={10} strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M20.4999 12H3.66992" stroke={stroke ?? "#9A9AAF"} strokeWidth="1.5" strokeMiterlimit={10} strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  }
+  if (name === Icons.ArrowRight) {
+    return (
+      <svg width={width ?? 16} height={height ?? 16} viewBox="0 0 16 16" fill={fill ?? "none"} xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.62 3.95337L13.6667 8.00004L9.62 12.0467" stroke={stroke ?? "#9A9AAF"} strokeWidth="1.5" strokeMiterlimit={10} strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M2.33333 8H13.5533" stroke={stroke ?? "#9A9AAF"} strokeWidth="1.5" strokeMiterlimit={10} strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  }
+  if (name === Icons.Users) {
+    return (
+      <svg width={width ?? 22} height={height ?? 22} viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.5002 6.5635C16.4452 6.55433 16.3811 6.55433 16.3261 6.5635C15.0611 6.51767 14.0527 5.48183 14.0527 4.1985C14.0527 2.88766 15.1069 1.8335 16.4177 1.8335C17.7286 1.8335 18.7827 2.89683 18.7827 4.1985C18.7736 5.48183 17.7652 6.51767 16.5002 6.5635Z" stroke={stroke ?? "#8B8B93"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M15.5561 13.2369C16.8119 13.4477 18.1961 13.2277 19.1677 12.5769C20.4602 11.7152 20.4602 10.3035 19.1677 9.44186C18.1869 8.79102 16.7844 8.57102 15.5286 8.79102" stroke={stroke ?? "#8B8B93"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M5.47232 6.5635C5.52732 6.55433 5.59149 6.55433 5.64649 6.5635C6.91149 6.51767 7.91982 5.48183 7.91982 4.1985C7.91982 2.88766 6.86565 1.8335 5.55482 1.8335C4.24399 1.8335 3.18982 2.89683 3.18982 4.1985C3.19899 5.48183 4.20732 6.51767 5.47232 6.5635Z" stroke={stroke ?? "#8B8B93"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6.41649 13.2369C5.16066 13.4477 3.77649 13.2277 2.80482 12.5769C1.51232 11.7152 1.51232 10.3035 2.80482 9.44186C3.78566 8.79102 5.18815 8.57102 6.44399 8.79102" stroke={stroke ?? "#8B8B93"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M11.0001 13.4107C10.9451 13.4015 10.881 13.4015 10.826 13.4107C9.56098 13.3648 8.55264 12.329 8.55264 11.0457C8.55264 9.73483 9.60681 8.68066 10.9176 8.68066C12.2285 8.68066 13.2826 9.744 13.2826 11.0457C13.2735 12.329 12.2651 13.374 11.0001 13.4107Z" stroke={stroke ?? "#8B8B93"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M8.33266 16.2981C7.04016 17.1598 7.04016 18.5715 8.33266 19.4331C9.79932 20.414 12.201 20.414 13.6677 19.4331C14.9602 18.5715 14.9602 17.1598 13.6677 16.2981C12.2102 15.3265 9.79932 15.3265 8.33266 16.2981Z" stroke={stroke ?? "#8B8B93"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+
+
+    )
+  }
+  if (name === Icons.Unlock) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? 20}
+        width={width ?? 20}
+        className={className}
+      >
+        <path d="M11 1a2 2 0 00-2 2v4a2 2 0 012 2v5a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2h5V3a3 3 0 016 0v4a.5.5 0 01-1 0V3a2 2 0 00-2-2zM3 8a1 1 0 00-1 1v5a1 1 0 001 1h6a1 1 0 001-1V9a1 1 0 00-1-1H3z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Locked) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? 20}
+        width={width ?? 20}
+        className={className}
+      >
+        <path d="M8 1a2 2 0 012 2v4H6V3a2 2 0 012-2zm3 6V3a3 3 0 00-6 0v4a2 2 0 00-2 2v5a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2zM5 8h6a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V9a1 1 0 011-1z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Shield) {
+    return (
+      <svg width={width ?? "17"} height={height ?? "20"} viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8.32101 19.9459L8.03616 19.8195C7.71913 19.6803 0.316406 16.337 0.316406 10.2829V5.03339C0.316688 4.52821 0.476356 4.036 0.772672 3.62685C1.06899 3.2177 1.48684 2.91247 1.96673 2.75464L8.36285 0.634399L14.759 2.75464C15.2389 2.91247 15.6567 3.2177 15.953 3.62685C16.2493 4.036 16.409 4.52821 16.4093 5.03339V10.2829C16.4093 17.1843 8.93576 19.7415 8.61712 19.8477L8.32101 19.9459ZM8.36285 2.32174L2.47607 4.27381C2.3159 4.32612 2.1764 4.42778 2.07753 4.56422C1.97867 4.70067 1.92552 4.86489 1.92569 5.03339V10.2829C1.92569 14.7036 7.1076 17.5714 8.40067 18.2175C9.69132 17.6985 14.8 15.3224 14.8 10.2829V5.03339C14.8002 4.86489 14.747 4.70067 14.6482 4.56422C14.5493 4.42778 14.4098 4.32612 14.2496 4.27381L8.36285 2.32174Z" fill={fill ?? "#7E7E8F"} />
+        <path d="M7.64742 12.3283H7.62086C7.4172 12.3252 7.21628 12.2808 7.03027 12.1978C6.84425 12.1148 6.67699 11.995 6.53862 11.8455L4.68311 9.91437L5.8426 8.80235L7.64822 10.6852L11.8171 6.51636L12.9549 7.65412L8.72162 11.8874C8.58062 12.0282 8.41307 12.1398 8.22869 12.2154C8.0443 12.2911 7.84673 12.3295 7.64742 12.3283Z" fill={fill ?? "#7E7E8F"} />
+      </svg>
+    )
+  }
+  if (name === Icons.Calendar) {
+    return (
+      <svg width={width ?? "16"} height={height ?? "18"} viewBox="0 0 16 18" fill={fill ?? "none"} xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.625 1V4.55556M5.375 1V4.55556M1 8.11111H15M15 8.11111V15.2222C15 16.2041 14.2165 17 13.25 17H2.75C1.7835 17 1 16.2041 1 15.2222V4.55556C1 3.57372 1.7835 2.77778 2.75 2.77778H13.25C14.2165 2.77778 15 3.57372 15 4.55556V8.11111Z" stroke={stroke ?? "#7E7E8F"} stroke-width="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  }
+  if (name === Icons.Copy) {
+    return (
+      <svg
+        width={width ?? 20}
+        height={height ?? 20}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+      >
+        <path
+          d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"
+          fill={fill}
+        />
+      </svg>
+    );
+  }
+  if (name === Icons.EyeOpen) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? "1em"}
+        width={width ?? "1em"}
+        className={className}
+      >
+        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 011.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0114.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 011.172 8z" />
+        <path d="M8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM4.5 8a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0z" />
+      </svg>
+    )
+  }
+  if (name === Icons.EyeClose) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? "1em"}
+        width={width ?? "1em"}
+        className={className}
+      >
+        <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 00-2.79.588l.77.771A5.944 5.944 0 018 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0114.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z" />
+        <path d="M11.297 9.176a3.5 3.5 0 00-4.474-4.474l.823.823a2.5 2.5 0 012.829 2.829l.822.822zm-2.943 1.299l.822.822a3.5 3.5 0 01-4.474-4.474l.823.823a2.5 2.5 0 002.829 2.829z" />
+        <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 001.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 018 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884l-12-12 .708-.708 12 12-.708.708z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Upload) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? 20}
+        width={width ?? 20}
+        className={className}
+      >
+        <path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5z" />
+        <path d="M7.646 1.146a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L8.5 2.707V11.5a.5.5 0 01-1 0V2.707L5.354 4.854a.5.5 0 11-.708-.708l3-3z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Download) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? 20}
+        width={width ?? 20}
+        className={className}
+      >
+        <path d="M.5 9.9a.5.5 0 01.5.5v2.5a1 1 0 001 1h12a1 1 0 001-1v-2.5a.5.5 0 011 0v2.5a2 2 0 01-2 2H2a2 2 0 01-2-2v-2.5a.5.5 0 01.5-.5z" />
+        <path d="M7.646 11.854a.5.5 0 00.708 0l3-3a.5.5 0 00-.708-.708L8.5 10.293V1.5a.5.5 0 00-1 0v8.793L5.354 8.146a.5.5 0 10-.708.708l3 3z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Reference) {
+    return (
+      <svg className={className} width={width ?? 20} height={height ?? 12} viewBox="0 0 20 12" fill={fill ?? "none"} xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.4201 11.22C18.0101 11.22 17.6701 10.88 17.6701 10.47V7.15002C17.6701 5.91002 16.6601 4.90002 15.4201 4.90002H1.58008C1.17008 4.90002 0.830078 4.56002 0.830078 4.15002C0.830078 3.74002 1.17008 3.40002 1.58008 3.40002H15.4201C17.4901 3.40002 19.1701 5.08002 19.1701 7.15002V10.47C19.1701 10.89 18.8301 11.22 18.4201 11.22Z" />
+        <path d="M4.74008 8.06998C4.55008 8.06998 4.36008 7.99995 4.21008 7.84995L1.05008 4.68997C0.910079 4.54997 0.830078 4.35994 0.830078 4.15994C0.830078 3.95994 0.910079 3.76998 1.05008 3.62998L4.21008 0.469941C4.50008 0.179941 4.98008 0.179941 5.27008 0.469941C5.56008 0.759941 5.56008 1.24 5.27008 1.53L2.64011 4.15994L5.27008 6.78995C5.56008 7.07995 5.56008 7.55995 5.27008 7.84995C5.12008 7.98995 4.93008 8.06998 4.74008 8.06998Z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Redo) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? "1em"}
+        width={width ?? "1em"}
+        className={className}
+      >
+        <path
+          fillRule="evenodd"
+          d="M8 3a5 5 0 11-4.546 2.914.5.5 0 00-.908-.417A6 6 0 108 2v1z"
+        />
+        <path d="M8 4.466V.534a.25.25 0 00-.41-.192L5.23 2.308a.25.25 0 000 .384l2.36 1.966A.25.25 0 008 4.466z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Undo) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? "1em"}
+        width={width ?? "1em"}
+        className={className}
+      >
+        <path
+          fillRule="evenodd"
+          d="M8 3a5 5 0 104.546 2.914.5.5 0 01.908-.417A6 6 0 118 2v1z"
+        />
+        <path d="M8 4.466V.534a.25.25 0 01.41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 018 4.466z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Format) {
+    return (
+      <svg
+        fill={fill ?? "currentColor"}
+        viewBox="0 0 16 16"
+        height={height ?? "1em"}
+        width={width ?? "1em"}
+        className={className}
+      >
+        <path d="M2.5 3a.5.5 0 000 1h11a.5.5 0 000-1h-11zm0 3a.5.5 0 000 1h6a.5.5 0 000-1h-6zm0 3a.5.5 0 000 1h6a.5.5 0 000-1h-6zm0 3a.5.5 0 000 1h11a.5.5 0 000-1h-11zm10.113-5.373a6.59 6.59 0 00-.445-.275l.21-.352c.122.074.272.17.452.287.18.117.35.26.51.428.156.164.289.351.398.562.11.207.164.438.164.692 0 .36-.072.65-.216.873-.145.219-.385.328-.721.328-.215 0-.383-.07-.504-.211a.697.697 0 01-.188-.463c0-.23.07-.404.211-.521.137-.121.326-.182.569-.182h.281a1.686 1.686 0 00-.123-.498 1.379 1.379 0 00-.252-.37 1.94 1.94 0 00-.346-.298zm-2.168 0A6.59 6.59 0 0010 6.352L10.21 6c.122.074.272.17.452.287.18.117.35.26.51.428.156.164.289.351.398.562.11.207.164.438.164.692 0 .36-.072.65-.216.873-.145.219-.385.328-.721.328-.215 0-.383-.07-.504-.211a.697.697 0 01-.188-.463c0-.23.07-.404.211-.521.137-.121.327-.182.569-.182h.281a1.749 1.749 0 00-.117-.492 1.402 1.402 0 00-.258-.375 1.94 1.94 0 00-.346-.3z" />
+      </svg>
+    )
+  }
+  if (name === Icons.Save) {
+    return (
+      <svg
+        fill={fill ?? "none"}
+        stroke={stroke ?? "currentColor"}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+        height={height ?? 20}
+        width={width ?? 20}
+        className={className}
+      >
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+        <path d="M17 21v-8H7v8M7 3v5h8" />
+      </svg>
     )
   }
 }

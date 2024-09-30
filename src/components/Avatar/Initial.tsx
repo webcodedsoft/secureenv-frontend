@@ -1,4 +1,4 @@
-const AvatarInitial = ({ name, avatarColor }: { name: string, avatarColor: string }) => {
+const AvatarInitial = ({ name, avatarColor, className }: { name: string, avatarColor: string, className?: string }) => {
   // Function to extract initials from the user's name
   const getInitials = (name: string) => {
     const nameArray = name.trim().split(' ');
@@ -17,7 +17,7 @@ const AvatarInitial = ({ name, avatarColor }: { name: string, avatarColor: strin
 
   return (
     <div
-      className={`flex items-center justify-center w-14 border-2 border-color-brands h-14 rounded-full text-white text-2xl font-bold`}
+      className={`flex items-center justify-center w-12 border-2 border-color-brands h-12 rounded-full text-white md:text-xl text-base font-bold ${className}`}
       style={{ backgroundColor: avatarColor }}
     >
       {initials}

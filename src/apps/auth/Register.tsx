@@ -12,6 +12,8 @@ import { Alert } from 'components/Toast'
 import CustomSelect from 'components/Forms/CustomSelect'
 import { services } from 'services'
 import { useSignUp } from 'common/queries-and-mutations/authentication'
+import useDebounce from 'common/hooks/useDebounce'
+import { debounce } from 'utils'
 
 export default function Register() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -19,6 +21,12 @@ export default function Register() {
   const dispatch = useAppDispatch()
 
   const { mutate, isSuccess, isError } = useSignUp()
+
+  // Initialize a debounced API call
+  const debouncedCheckIfEmailInUse = debounce(async (value: string, resolve: (value: boolean) => void) => {
+    const isInUse = await services.authService.checkIfEmailInUse(value);
+    resolve(!isInUse);
+  }, 300);
 
   const formik = useFormik({
     initialValues: {
@@ -44,15 +52,18 @@ export default function Register() {
       emailAddress: Yup.string()
         .email("Invalid email")
         .required("Email is required")
-        .test("is-allowed", "Email already in use", async function (value) {
-          if (value) {
-            const isInUse = await services.authService.checkIfEmailInUse(
-              value
-            );
-            console.log('🚀 ~ isInUse:', isInUse)
-            return !isInUse;
-          }
-          return true;
+        .test("is-allowed", "Email already in use", async (value): Promise<boolean> => {
+          return new Promise((resolve) => {
+            if (value && value.length > 4) {
+              if (Yup.string().email().isValidSync(value)) {
+                debouncedCheckIfEmailInUse(value, resolve);
+              } else {
+                resolve(false);
+              }
+            } else {
+              resolve(false);
+            }
+          });
         }),
       name: Yup.string().required('Name is required').nullable(),
       accountType: Yup.object().required('Register as is required').nullable(),
@@ -76,6 +87,7 @@ export default function Register() {
       setIsSubmitting(false)
       toast(<Alert type="success" message="We sent a setup link to your email. It’s probably telling jokes to the other emails, so go join the fun!" />)
       formik.resetForm()
+      navigate('/auth/login')
     } else if (isError) {
       setIsSubmitting(false)
     }
@@ -132,8 +144,8 @@ export default function Register() {
           <div className="form-control mb-[20px]">
             <TextField
               name="name"
-              placeholder="Name"
-              label="Name"
+              placeholder="Your Name"
+              label="Your Name"
               size="lg"
               type='text'
               isRequired

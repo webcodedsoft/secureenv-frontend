@@ -1,11 +1,13 @@
 import { lazy } from 'react'
-import ForgotPassword from './ForgotPassword'
-import Register from './Register'
-import VerifySuccess from './VerifySuccess'
-import ResetPassword from './ResetPassword'
+import SignUpInvite from './SignUpInvite'
 
 const AuthLayout = lazy(() => import('../../components/layouts/AuthLayout'))
 const Login = lazy(() => import('./Login'))
+const CreateWorkspace = lazy(() => import('./CreateWorkspace'))
+const ResetPassword = lazy(() => import('./ResetPassword'))
+const VerifySuccess = lazy(() => import('./VerifySuccess'))
+const Register = lazy(() => import('./Register'))
+const ForgotPassword = lazy(() => import('./ForgotPassword'))
 
 const authRoutes = [
   {
@@ -29,9 +31,17 @@ const authRoutes = [
         element: <Register />,
       },
       {
+        path: 'invite',
+        element: <SignUpInvite />,
+      },
+      {
         path: 'welcome',
         element: <VerifySuccess />,
       },
+      {
+        path: 'workspace-setup',
+        element: <CreateWorkspace />
+      }
     ],
   },
 ]

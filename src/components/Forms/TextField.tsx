@@ -9,7 +9,7 @@ interface TextFieldProps {
   type?: React.HTMLInputTypeAttribute | undefined
   onChange?: (e: React.ChangeEvent<any>) => void
   onBlur?: (e: React.FocusEvent<any, Element>) => void
-  value: string | null
+  value: string | null | number
   label?: string
   placeholder: string
   name: string

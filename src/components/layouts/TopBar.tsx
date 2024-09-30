@@ -1,17 +1,24 @@
-import React from 'react'
 import Logo from '../../assets/icons/icon-logo.svg'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import AvatarInitial from 'components/Avatar/Initial'
-import { useAppSelector } from 'store/hooks'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
 import { selectAccountDetails } from 'selectors/account-selector'
 import { Icon, Icons } from 'components/Icon'
+import { logout } from 'thunks/account-thunk'
 
 export default function TopBar() {
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
 
   const { user } = useAppSelector(selectAccountDetails);
 
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate('/', { replace: true })
+  }
+
   return (
-    <header className="md:flexs shadow-md items-center justify-between flex-wrap bg-neutral-bg p-5 gap-5 md:py-6 md:pl-[25px] md:pr-[38px] lg:flex-nowrap dark:bg-dark-neutral-bg lg:gap-0">
+    <header className="md:flexs shadow-md items-center justify-between flex-wrap bg-neutral-bg p-5 gap-5 md:py-2 md:pl-[25px] md:pr-[38px] lg:flex-nowrap dark:bg-dark-neutral-bg lg:gap-0" >
       <Link className="hidden logo" to="">
         <img
           className="md:mr-[100px] lg:mr-[133px]"
@@ -31,7 +38,7 @@ export default function TopBar() {
               <li className="text-gray-500 hover:text-gray-1100 hover:bg-gray-100 dark:text-gray-dark-500 dark:hover:text-gray-dark-1100 dark:hover:bg-gray-dark-100 rounded-lg group p-4 pl-5">
                 <NavLink
                   className="flex items-center bg-transparent p-0 gap-2"
-                  to={`/organization/${user.company.companyId}`}
+                  to={`/workspace/${user.workspace.workspaceId}`}
                 >
                   <i className="w-4 h-4 grid place-items-center mr-2">
                     <Icon name={Icons.Project} />
@@ -42,7 +49,7 @@ export default function TopBar() {
               <li className="text-gray-500 hover:text-gray-1100 hover:bg-gray-100 dark:text-gray-dark-500 dark:hover:text-gray-dark-1100 dark:hover:bg-gray-dark-100 rounded-lg group p-4 pl-5">
                 <NavLink
                   className="flex items-center bg-transparent p-0 gap-2"
-                  to={`/organization/${user.company.companyId}/settings`}
+                  to={`/workspace/${user.workspace.workspaceId}/settings`}
                 >
                   {' '}
                   <i className="w-4 h-4 grid place-items-center mr-2">
@@ -56,6 +63,7 @@ export default function TopBar() {
                 <button
                   className="flex items-center bg-transparent p-0 gap-2"
                   type="button"
+                  onClick={handleLogout}
                 >
                   <i className="w-4 h-4 grid place-items-center">
                     <Icon name={Icons.Logout} />
@@ -67,6 +75,6 @@ export default function TopBar() {
           </ul>
         </div>
       </div>
-    </header>
+    </header >
   )
 }

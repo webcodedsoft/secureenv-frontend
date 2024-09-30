@@ -10,13 +10,19 @@ interface IAlertProps {
   message: string
   closeToast?: () => void
   header: string
-  handleConfirm: () => void
+  handleMerge: () => void
+  handleReplace: () => void
   beforeClose?: () => void
 }
 
-export const Action: FC<IAlertProps> = ({ closeToast, type, message, header, handleConfirm, beforeClose }) => {
-  const close = () => {
-    handleConfirm()
+export const Action: FC<IAlertProps> = ({ closeToast, type, message, header, handleReplace, beforeClose, handleMerge }) => {
+
+  const merge = () => {
+    handleMerge()
+    closeToast!()
+  }
+  const replace = () => {
+    handleReplace()
     closeToast!()
   }
 
@@ -26,26 +32,29 @@ export const Action: FC<IAlertProps> = ({ closeToast, type, message, header, han
   }
 
   return (
-    <div className="flex items-start ">
-      <div>
-        <ToastIcon type={type} />
-      </div>
-      <div className="ml-3 mr-auto">
-        <p className="mb-2 font-normal text-primary-800">{header}</p>
-        <p className="mb-4 text-xs text-primary-800">{message}</p>
-        <div className="flex">
-          <Button variant="outline" size="sm" className="w-fit rounded" onClick={close} label="Confirm"></Button>
-          <Button variant="outline" size="sm" className="w-fit rounded" onClick={cancel} label="Cancel"></Button>
+    <div className='dark:bg-color-brands bg-color-brands rounded-md'>
+      <div className="flex items-start p-5">
+        <div>
+          <ToastIcon type={type} />
         </div>
+        <div className="ml-3 mr-auto">
+          <p className="mb-2 font-normal text-base">{header}</p>
+          <p className="mb-4 text-xs text-primary-800">{message}</p>
+          <div className="flex gap-x-4">
+            <Button variant="secondary" size="sm" className="w-fit rounded" onClick={merge} label="Merge"></Button>
+            <Button variant="secondary" size="sm" className="w-fit rounded" onClick={replace} label="Replace"></Button>
+            <Button variant="secondary" size="sm" className="w-fit rounded" onClick={cancel} label="Discard"></Button>
+          </div>
+        </div>
+        <button onClick={cancel} type="button">
+          <Icon name={Icons.Cancel} fill={fillColor[type]} height={20} width={20} />
+        </button>
       </div>
-      <button onClick={cancel} type="button">
-        <Icon name={Icons.Cancel} fill={fillColor[type]} height={20} width={20} />
-      </button>
     </div>
   )
 }
 
 Action.defaultProps = {
-  closeToast: () => {},
-  beforeClose: () => {},
+  closeToast: () => { },
+  beforeClose: () => { },
 }

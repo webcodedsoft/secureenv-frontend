@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios'
 
 export const determinePathName = (pathname: string) => {
   const parts = pathname.split('/')
-  const dashboardIndex = parts[2] || parts[1]
+  const dashboardIndex = parts[3] || parts[2]
   return dashboardIndex
 }
 
@@ -108,3 +108,93 @@ export const formatToMoney = (numberOrString: string | number | undefined, decim
   })
 }
 
+export function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  return function (this: any, ...args: Parameters<T>): void {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+export const capitalizeFirstLetter = (text: string) => {
+  if (typeof text === 'string' && text.trim().length > 0) {
+    return `${text[0].toUpperCase().trim()}${text
+      .slice(1)
+      .toLowerCase()
+      .trim()}`;
+  }
+  return '';
+};
+
+export const readFileContent = async (file: any): Promise<string> => {
+  const reader = new FileReader();
+  return new Promise((resolve, reject) => {
+    reader.onload = (event) => resolve(event.target!.result as string);
+    reader.onerror = (error) => reject(error);
+    reader.readAsText(file);
+  });
+};
+
+export const compareValue = (obj1: any, obj2: any): boolean => {
+  return JSON.stringify(obj1) === JSON.stringify(obj2);
+}
+
+export const generateStrongPassword = (length: number = 16): string => {
+  const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
+  const numericChars = '0123456789';
+  const specialChars = '!@#$%^&*()_+[]{}|;:,.<>?';
+
+  const allChars = upperCaseChars + lowerCaseChars + numericChars + specialChars;
+
+  let password = '';
+
+  // Ensure at least one character from each category is included
+  password += upperCaseChars[Math.floor(Math.random() * upperCaseChars.length)];
+  password += lowerCaseChars[Math.floor(Math.random() * lowerCaseChars.length)];
+  password += numericChars[Math.floor(Math.random() * numericChars.length)];
+  password += specialChars[Math.floor(Math.random() * specialChars.length)];
+
+  // Fill the rest of the password with random characters from all categories
+  for (let i = password.length; i < length; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+
+  // Shuffle the password to prevent predictable patterns
+  password = password.split('').sort(() => 0.5 - Math.random()).join('');
+  return password;
+}
+
+export const maskData = (data: any, shouldMask = false) => {
+  if (shouldMask) {
+    const lines = data.split('\n');
+    return lines.map((line: any) => {
+      if (line.trim() === '') return line; // Ignore empty lines
+
+      let isComment = false;
+      let cleanedLine = line.trim();
+
+      if (cleanedLine.startsWith('#')) {
+        isComment = true;
+        cleanedLine = cleanedLine.slice(1).trim(); // Remove the comment marker
+      }
+
+      const [key, value] = cleanedLine.split('=');
+      if (!value) {
+        return line; // Ignore non-sensitive values
+      }
+
+      const maskedLine = `${key.trim()}=********`; // Mask sensitive values
+
+      // Add comment marker back if the original line was a comment
+      return isComment ? `# ${maskedLine}` : maskedLine;
+    }).join('\n');
+  }
+  return data
+}
+
+// TODO!?: Write a mask function to mask object

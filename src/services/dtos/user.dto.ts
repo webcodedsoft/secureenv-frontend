@@ -1,5 +1,5 @@
 import { PaginatedListMeta } from 'types/general.type'
-import { CompanyDto } from './company.dto'
+import { WorkspaceDto } from './workspace.dto'
 
 export interface CreateUserResponseDto {
   authorization_url: string
@@ -10,7 +10,7 @@ export interface CreateUserResponseDto {
 export interface UserInfoDto {
   id: number | null
   accountId: number | null
-  companyId: number | null
+  workspaceId: number | null
   name: string
   emailAddress: string
   accountType: string
@@ -25,7 +25,8 @@ export interface UserInfoDto {
   createdAt: string,
   updatedAt: string,
   deletedAt: string,
-  company: CompanyDto
+  isDecryptionPassword: boolean,
+  workspace: WorkspaceDto
 }
 
 export interface UserType {
@@ -36,7 +37,7 @@ export interface UserType {
 export const initialUserValue = {
   id: null,
   accountId: null,
-  companyId: null,
+  workspaceId: null,
   name: '',
   emailAddress: '',
   accountType: '',
@@ -47,17 +48,16 @@ export const initialUserValue = {
   twoFAEnabled: false,
   isGoogle: false,
   isMicrosoft: false,
+  isDecryptionPassword: false,
   createdAt: '',
   avatarColor: '',
   updatedAt: '',
   deletedAt: '',
-  company: {
+  workspace: {
     id: null,
-    companyId: "",
-    name: "",
+    workspaceId: "",
+    workspaceName: "",
     emailAddress: "",
-    companyUrl: "",
-    address: "",
     slug: "",
     createdAt: "",
     updatedAt: '',
@@ -120,3 +120,12 @@ export interface BulkUsersDto {
   branch: string
   branchId: number
 }
+
+export type UpdateInformationDto = {
+  name: string;
+};
+
+export type ResetPasswordPayload = {
+  oldPassword: string;
+  newPassword: string;
+};

@@ -11,7 +11,7 @@ interface IAlertProps {
 }
 
 export const Alert: FC<IAlertProps> = ({ closeToast, type, message }) => (
-  <div className="dark:bg-transparent bg-color-brands rounded-md">
+  <div className="dark:bg-transparents bg-color-brands rounded-md">
     <div className="flex items-center p-5">
       <div>
         <ToastIcon type={type} />

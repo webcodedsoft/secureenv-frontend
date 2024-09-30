@@ -7,7 +7,7 @@ import { Icon, Icons } from 'components/Icon'
 type VariantTypes = 'primary' | 'secondary' | 'outline' | 'transparent'
 type SizeTypes = 'sm' | 'md' | 'lg' | 'custom'
 
-interface ButtonProps {
+export interface ButtonProps {
   variant: VariantTypes
   size?: SizeTypes
   label?: string

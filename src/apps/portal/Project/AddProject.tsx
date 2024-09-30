@@ -3,21 +3,31 @@ import TextField from 'components/Forms/TextField'
 import { Icon, Icons } from 'components/Icon'
 import { languages } from 'constants/languages'
 import { useFormik } from 'formik'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import Star from '../../../assets/icons/icon-star-yellow.svg'
 import Button from 'components/Forms/Button'
+import ConfirmModal from 'components/Modal/ConfirmModal'
+import withCreatePortal from 'components/HOC/withCreatePortal'
+import { useCreateProject } from 'common/queries-and-mutations/project'
+import { toast } from 'react-toastify'
+import { Alert } from 'components/Toast'
+
+const EhanchedConfirm = withCreatePortal(ConfirmModal);
 
 export default function AddProject() {
   const isDarkMode = useDarkMode()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+
+  const { mutate, isSuccess, isError } = useCreateProject()
 
   const formik = useFormik({
     initialValues: {
       language: '',
       projectName: '',
       repositoryUrl: '',
-      isRequirePassword: true
+      isRequireEncyptPassword: true
     },
     validationSchema: Yup.object({
       language: Yup.string().required('Platform is required').nullable(),
@@ -25,12 +35,35 @@ export default function AddProject() {
       repositoryUrl: Yup.string().url('Project name is required').nullable()
     }),
     onSubmit: (values, { setFieldTouched }) => {
-      setIsSubmitting(true)
       for (const key in values) {
         setFieldTouched(key, true)
       }
+      // TODO!: Need to check if this has been set by user
+      if (formik.values.isRequireEncyptPassword) {
+        setShowConfirmModal(true)
+        return
+      } else {
+        handleSubmit()
+      }
     }
   })
+
+  const handleSubmit = () => {
+    setIsSubmitting(true)
+    mutate({ ...formik.values })
+  }
+
+  useEffect(() => {
+    if (isSuccess && !isError) {
+      setIsSubmitting(false)
+      toast(<Alert type="success" message="Success! Your new project is live and ready to take over the world (or at least your to-do list)!" />)
+      formik.resetForm()
+      setShowConfirmModal(false)
+    } else if (isError) {
+      setIsSubmitting(false)
+    }
+  }, [isSuccess, isError])
+
 
   return (
     <div className="border bg-neutral-bg border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border rounded-2xl md:p-10 p-5 md:mx-40">
@@ -124,10 +157,11 @@ export default function AddProject() {
           <div className="flex justify-end gap-x-10">
             <div className="flex items-center gap-x-3">
               <input
-                value={formik.values.isRequirePassword ? 'yes' : 'no'}
+                value={formik.values.isRequireEncyptPassword ? 'yes' : 'no'}
+                defaultChecked={formik.values.isRequireEncyptPassword}
                 className="checkbox checkbox-primary rounded border-2 w-[18px] h-[18px]"
                 type="checkbox"
-                onChange={() => formik.setFieldValue('isRequirePassword', !formik.values.isRequirePassword)}
+                onChange={() => formik.setFieldValue('isRequireEncyptPassword', !formik.values.isRequireEncyptPassword)}
               />
               <span className="text-gray-500 leading-4 dark:text-gray-dark-500 text-[14px] max-w-[183px]">
                 Require decryption password to read and write
@@ -145,6 +179,21 @@ export default function AddProject() {
           </div>
         </form>
       </div>
+      {showConfirmModal && (
+        <EhanchedConfirm
+          title="Enable Decryption Password Requirement"
+          content="<div class='pb-5 text-sm'>Are you sure you want to enable the “Require Decryption Password” option for reading and writing files? This will add an extra layer of security, ensuring that anyone accessing your files must provide a decryption password. Once enabled, all read and write operations will be password-protected.</div>
+	        <p class='py-2 text-left text-sm'>• If you enable this, you’ll be prompted to enter the password each time you access encrypted files.</p>
+	        <p class='py-2 text-left text-sm'>•	Be sure to keep your password safe! Without it, the encrypted files will be inaccessible.</p>
+          <span class='text-sm pt-2'>Do you want to proceed?</span>"
+          actionText="Yes"
+          cancelText="No"
+          onConfirm={handleSubmit}
+          onCancel={() => setShowConfirmModal(false)}
+          isSubmitting={isSubmitting}
+          className="md:w-[40%] sm:w-[20%]"
+        />
+      )}
     </div>
   )
 }

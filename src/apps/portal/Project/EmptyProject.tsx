@@ -5,8 +5,13 @@ import EmptyStateDark from '../../../assets/icons/undraw_blank_canvas_dark.svg'
 import Square from '../../../assets/icons/square.svg'
 import SquareDark from '../../../assets/icons/square-dark.svg'
 import { Link } from 'react-router-dom'
+import { UserInfoDto } from 'services/dtos/user.dto'
 
-export default function EmptyProject() {
+type IProps = {
+  user: UserInfoDto
+}
+
+export default function EmptyProject({ user }: IProps) {
   return (
     <div className="flex justify-between gap-6 flex-col xl:flex-row">
       <div className="flex-1 py-20">
@@ -41,7 +46,7 @@ export default function EmptyProject() {
           Let’s get the ball rolling—start a fresh project! it’s time to start building your empire!
         </p>
         <div className='flex items-center justify-center'>
-          <Link to="/add-project">
+          <Link to={`/workspace/${user.workspace.workspaceId}/add-project`}>
             <Button
               type="button"
               variant="primary"

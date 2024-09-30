@@ -9,6 +9,7 @@ import * as Yup from 'yup'
 import { login, logout } from 'thunks/account-thunk'
 import { toast } from 'react-toastify'
 import { Alert } from 'components/Toast'
+import { resetAccountState } from 'reducers/account.reducer'
 
 export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -32,11 +33,7 @@ export default function Login() {
       for (const key in values) {
         setFieldTouched(key, true)
       }
-      try {
-        dispatch(login({ emailAddress: values.emailAddress.trim(), password: values.password.trim() }))
-      } catch (error) {
-        console.log('Error', error)
-      }
+      dispatch(login({ emailAddress: values.emailAddress.trim(), password: values.password.trim() }))
     },
   })
 
@@ -52,7 +49,11 @@ export default function Login() {
   useEffect(() => {
     if (isAuthenticated) {
       if (user) {
-        navigate(`/organization/${user.company.companyId}`)
+        if (user?.workspace) {
+          navigate(`/workspace/${user.workspace.workspaceId}/project`)
+        } else {
+          navigate(`/auth/workspace-setup`)
+        }
         setIsSubmitting(false)
       }
     }
@@ -110,14 +111,14 @@ export default function Login() {
         </div>
         <Link
           className="text-right text-xs block text-[#8083A3] mb-[20px]"
-          to="/forgot-password"
+          to="/auth/forgot-password"
         >
           Forgot password?
         </Link>
 
         <p className="text-sm text-gray-1100 dark:text-gray-dark-1100">
           Don’t have an account?
-          <Link className="text-color-brands font-semibold" to="/sign-up">
+          <Link className="text-color-brands font-semibold" to="/auth/sign-up">
             &nbsp;Sign up
           </Link>
         </p>

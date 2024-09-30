@@ -1,12 +1,26 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { Icon, Icons } from 'components/Icon';
 import TextField from 'components/Forms/TextField';
 import Button from 'components/Forms/Button';
+import { UserInfoDto } from 'services/dtos/user.dto';
+import { useChangePassword } from 'common/queries-and-mutations/user';
+import { useAppDispatch } from 'store/hooks';
+import { toast } from 'react-toastify';
+import { Alert } from 'components/Toast';
+import { logout } from 'thunks/account-thunk';
+import { useNavigate } from 'react-router-dom';
 
-export default function PasswordSetting() {
+type IProps = {
+  user: UserInfoDto
+}
+
+export default function PasswordSetting({ user }: IProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutate, isSuccess, isError } = useChangePassword()
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate()
 
   const formik = useFormik({
     initialValues: {
@@ -36,9 +50,23 @@ export default function PasswordSetting() {
       for (const key in values) {
         setFieldTouched(key, true)
       }
-      // mutate({ emailAddress: emailAddress!, password: values.password, token: token! })
+      mutate({ oldPassword: values.currentPassword, newPassword: values.confirmPassword })
     },
   })
+
+  useEffect(() => {
+    if (isSuccess && !isError) {
+      setIsSubmitting(false)
+      toast(<Alert type="success" message="Account Password Successfully Reset" />)
+      formik.resetForm()
+      dispatch(logout());
+      navigate("/auth/login");
+
+    } else if (isError) {
+      setIsSubmitting(false)
+    }
+  }, [isSuccess, isError])
+
   return (
     <div className="border bg-neutral-bg border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border rounded-2xl ">
       <div className="bg-neutral rounded-t-lg py-4 pl-5 mb-7 dark:bg-dark-neutral-border">

@@ -4,10 +4,13 @@ import Button from 'components/Forms/Button'
 import TextField from 'components/Forms/TextField'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CustomSelect from 'components/Forms/CustomSelect'
 import { Icon, Icons } from 'components/Icon'
 import useDarkMode from 'common/hooks/useDarkMode'
+import { useCreateTeam } from 'common/queries-and-mutations/team'
+import { Alert } from 'components/Toast'
+import { toast } from 'react-toastify'
 
 type IProps = {
   onClose: () => void
@@ -15,18 +18,20 @@ type IProps = {
 export default function AddTeamModal({ onClose }: IProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isDarkMode = useDarkMode()
+  const { mutate, isSuccess, isError } = useCreateTeam();
 
   const formik = useFormik({
     initialValues: {
-      formFields: [
+      teamMembers: [
         {
           emailAddress: '',
           role: { value: '', label: '' }
         },
       ],
     },
+    enableReinitialize: true,
     validationSchema: Yup.object({
-      formFields: Yup.array().of(
+      teamMembers: Yup.array().of(
         Yup.object().shape({
           emailAddress: Yup.string().email('Invalid email address').required('Email is required').nullable(),
           role: Yup.object().shape({
@@ -41,27 +46,41 @@ export default function AddTeamModal({ onClose }: IProps) {
       for (const key in values) {
         setFieldTouched(key, true)
       }
-      try {
-      } catch (error) {
-        console.log('Error', error)
-      }
+      mutate(values)
     },
   })
 
   const addMoreFields = () => {
-    formik.values.formFields.push({
+    formik.values.teamMembers.push({
       emailAddress: '',
       role: { label: '', value: '' }
     })
-    formik.setFieldValue('formFields', [
-      ...formik.values.formFields,
+    formik.setFieldValue('teamMembers', [
+      ...formik.values.teamMembers,
     ]);
   };
 
   const removeField = (index: number) => {
-    formik.values.formFields.splice(index, 1);
-    formik.setFieldValue('formFields', [...formik.values.formFields])
+    formik.values.teamMembers.splice(index, 1);
+    formik.setFieldValue('teamMembers', [...formik.values.teamMembers])
   }
+  const isSecondFieldInvalid = useMemo(() => {
+    if (formik.values.teamMembers.length > 1) {
+      const secondField = formik.values.teamMembers[1];
+      return !secondField.emailAddress || !secondField.role.value || !secondField.role.label;
+    }
+    return true;
+  }, [formik.values.teamMembers]);
+
+  useEffect(() => {
+    if (isSuccess && !isError) {
+      setIsSubmitting(false)
+      toast(<Alert type="success" message="Success! A new team member has joined the ranks—ready to conquer the world (or at least the next project)!" />)
+      formik.resetForm()
+    } else if (isError) {
+      setIsSubmitting(false)
+    }
+  }, [isSuccess, isError])
 
   return (
     <InfoModal width={`w-full max-w-[694px]`} className="h-fit mt-24 md:mt-0 rounded-lg pb-5 justify-centers flex w-full flex-col">
@@ -70,12 +89,11 @@ export default function AddTeamModal({ onClose }: IProps) {
           <h6 className="text-header-6 font-semibold text-gray-500 dark:text-gray-dark-500">
             Invite New Members
           </h6>
-          <span className='text-sm font-normal text-gray-500 dark:text-gray-dark-1100'>Invite new members by email to join your organization.</span>
-
+          <span className='text-sm font-normal text-gray-500 dark:text-gray-dark-1100'>Invite new members by email to join your workspace.</span>
           <form onSubmit={formik.handleSubmit}>
             <div className='my-10'>
-              {formik.values.formFields.map((field, index) => (
-                <div className="md:flex items-center gap-x-5">
+              {formik.values.teamMembers.map((field, index) => (
+                <div className="md:flex items-center gap-x-5" key={`form_${index}`}>
                   <div className="w-full md:flex items-center gap-x-5 space-y-2">
                     <TextField
                       placeholder="Email address"
@@ -86,9 +104,9 @@ export default function AddTeamModal({ onClose }: IProps) {
                       type="text"
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      error={formik.touched.formFields ?
-                        formik.errors.formFields?.[index] && formik.errors.formFields.length > 0 ? JSON.parse(JSON.stringify(formik.errors.formFields[index])).emailAddress : '' : ''}
-                      name={`formFields[${index}].emailAddress`}
+                      error={formik.touched.teamMembers ?
+                        formik.errors.teamMembers?.[index] && formik.errors.teamMembers.length > 0 ? JSON.parse(JSON.stringify(formik.errors.teamMembers[index])).emailAddress : '' : ''}
+                      name={`teamMembers[${index}].emailAddress`}
                       value={field.emailAddress}
                     />
                     <div className="form-control">
@@ -96,10 +114,11 @@ export default function AddTeamModal({ onClose }: IProps) {
                         options={[
                           { label: 'Collaborator', value: 'COLLABORATOR' },
                           { label: 'Viewer', value: 'VIEWER' },
+                          { label: 'Admin', value: 'ADMIN' },
                         ]}
                         selectedOption={field.role}
                         handleOptionChange={(option) => {
-                          formik.setFieldValue(`formFields[${index}].role`, option)
+                          formik.setFieldValue(`teamMembers[${index}].role`, option)
                         }}
                         placeholder="Role"
                         label="Role"
@@ -107,12 +126,13 @@ export default function AddTeamModal({ onClose }: IProps) {
                         isSearchable
                         isRequired
                         className="h-11 rounded text-left w-44 mb-2"
-                        error={formik.touched.formFields ?
-                          formik.errors.formFields?.[index] && formik.errors.formFields.length > 0 ? JSON.parse(JSON.stringify(formik.errors.formFields[index])).role.value : '' : ''}
+                        error={formik.touched.teamMembers ?
+                          formik.errors.teamMembers?.[index] && formik.errors.teamMembers.length > 0 ? JSON.parse(JSON.stringify(formik.errors.teamMembers[index])).role.value : '' : ''}
                       />
                     </div>
                   </div>
-                  <button type='button' className='mt-5 disabled:text-slate-500 text-red' disabled={index === 0}
+                  <button type='button' className='mt-5 disabled:text-slate-500 text-red'
+                    disabled={index === 0 && isSecondFieldInvalid}
                     onClick={() => removeField(index)}
                   >
                     <span className=' text-xs leading-4'>Delete</span>
