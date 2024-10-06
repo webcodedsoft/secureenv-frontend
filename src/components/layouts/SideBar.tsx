@@ -93,7 +93,7 @@ export default function SideBar({
   return (
     <aside className="relative row-span-2 hidden flex-col justify-between border-r border-neutral bg-white p-[25px] shadow-lg md:flex dark:border-dark-neutral-border dark:bg-dark-neutral-bg">
       <div>
-        <Link className="mb-10" to="dashboard">
+        <Link className="mb-10" to="project">
           <img className="logo-maximize" src={Logo} alt="Frox logo" />
         </Link>
         <div className="pb-[18px] pt-[106px] lg:pt-[35px]">
