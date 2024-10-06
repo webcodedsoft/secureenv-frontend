@@ -12,17 +12,23 @@ type Props = {
   projectId: number
 }
 
-export default function EditorDataProtection({ onSuccess, environmentId, projectId }: Props) {
+export default function EditorDataProtection({
+  onSuccess,
+  environmentId,
+  projectId
+}: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { mutate, isSuccess, isError, data } = useValidateDecryptionPassword();
+  const { mutate, isSuccess, isError, data } = useValidateDecryptionPassword()
 
   const formik = useFormik({
     initialValues: {
-      decryptionPassword: '',
+      decryptionPassword: ''
     },
     validationSchema: Yup.object({
-      decryptionPassword: Yup.string().required("Decryption password is required").nullable(),
+      decryptionPassword: Yup.string()
+        .required('Decryption password is required')
+        .nullable()
     }),
     enableReinitialize: true,
     onSubmit: (values, { setFieldTouched }) => {
@@ -35,7 +41,7 @@ export default function EditorDataProtection({ onSuccess, environmentId, project
         environmentId,
         projectId
       })
-    },
+    }
   })
 
   useEffect(() => {
@@ -49,20 +55,23 @@ export default function EditorDataProtection({ onSuccess, environmentId, project
   }, [isSuccess, isError])
 
   return (
-    <form onSubmit={formik.handleSubmit} autoComplete='off'>
-      <div className="absolute inset-0 md:top-56 md:left-[17rem] bg-black bg-opacity-80 flex items-center justify-center z-10">
-        <div className="bg-neutral-bg dark:bg-dark-neutral-bg p-6 rounded-lg shadow-lg text-center">
-          <h3 className="text-lg font-bold mb-4 text-gray-1100 dark:text-gray-dark-1100">Access Protected Data</h3>
+    <form onSubmit={formik.handleSubmit} autoComplete="off">
+      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black bg-opacity-80 md:left-[17rem] md:top-56">
+        <div className="rounded-lg bg-neutral-bg p-6 text-center shadow-lg dark:bg-dark-neutral-bg">
+          <h3 className="mb-4 text-lg font-bold text-gray-1100 dark:text-gray-dark-1100">
+            Access Protected Data
+          </h3>
           <p className="mb-4 text-gray-1100 dark:text-gray-dark-1100">
-            Your decryption password is required to ensure that sensitive information remains secure.
+            Your decryption password is required to ensure that sensitive
+            information remains secure.
           </p>
-          <div className='flex items-center flex-col'>
+          <div className="flex flex-col items-center">
             <TextField
               name="decryptionPassword"
               placeholder="Decryption password"
               label="Set Decryption Password"
               size="lg"
-              type='password'
+              type="password"
               isRequired
               value={formik.values.decryptionPassword}
               onChange={formik.handleChange}
@@ -73,7 +82,7 @@ export default function EditorDataProtection({ onSuccess, environmentId, project
               type="submit"
               variant="primary"
               size="md"
-              className="rounded-md py-4 mt-5 w-32 text-base text-white"
+              className="mt-5 w-32 rounded-md py-4 text-base text-white"
               label="Validate"
               disabled={isSubmitting}
               loading={isSubmitting}

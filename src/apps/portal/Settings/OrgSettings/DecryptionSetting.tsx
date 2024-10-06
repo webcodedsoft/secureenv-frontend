@@ -23,15 +23,16 @@ export default function DecryptionSetting({ user }: Props) {
 
   const formik = useFormik({
     initialValues: {
-      decryptionPassword: '',
+      decryptionPassword: ''
     },
     validationSchema: Yup.object({
-      decryptionPassword: Yup.string().matches(
-        // eslint-disable-next-line no-useless-escape
-        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}\[\]:;<>,.?~|]).{8,40}$/,
-        'Decryption password must have at least one uppercase, one lowercase, one number, one character and be at least 8 characters long',
-      )
-        .nullable(),
+      decryptionPassword: Yup.string()
+        .matches(
+          // eslint-disable-next-line no-useless-escape
+          /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}\[\]:;<>,.?~|]).{8,40}$/,
+          'Decryption password must have at least one uppercase, one lowercase, one number, one character and be at least 8 characters long'
+        )
+        .nullable()
     }),
     enableReinitialize: true,
     onSubmit: (values, { setFieldTouched }) => {
@@ -40,16 +41,21 @@ export default function DecryptionSetting({ user }: Props) {
         setFieldTouched(key, true)
       }
       mutate({
-        password: values.decryptionPassword,
+        password: values.decryptionPassword
       })
-    },
+    }
   })
 
   useEffect(() => {
     if (isSuccess && !isError) {
       setIsSubmitting(false)
       setShowRecoveryModal(true)
-      toast(<Alert type="success" message="Tada! Decryption Password Successfully Set. You’re ready to roll!" />)
+      toast(
+        <Alert
+          type="success"
+          message="Tada! Decryption Password Successfully Set. You’re ready to roll!"
+        />
+      )
       formik.resetForm()
     } else if (isError) {
       setIsSubmitting(false)
@@ -57,18 +63,21 @@ export default function DecryptionSetting({ user }: Props) {
   }, [isSuccess, isError])
 
   const handleSuggestPassword = () => {
-    const newPassword = generateStrongPassword(30);
-    formik.setFieldValue('decryptionPassword', newPassword);
-  };
+    const newPassword = generateStrongPassword(30)
+    formik.setFieldValue('decryptionPassword', newPassword)
+  }
 
   return (
     <div>
-      <div className="border bg-neutral-bg border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border rounded-2xl">
-        {!user.isDecryptionPassword ? (
+      <div className="rounded-2xl border border-neutral bg-neutral-bg dark:border-dark-neutral-border dark:bg-dark-neutral-bg">
+        {user.isDecryptionPassword ? (
           <>
-            <div className="bg-neutral rounded-t-lg py-4 pl-5 dark:bg-dark-neutral-border">
-              <p className="text-gray-1100 leading-4 font-semibold dark:text-gray-dark-1100 text-sm">
-                Decryption Password <span className='text-[10px] text-yellow'>Strong Passwords Only—We Don’t Mess with Weak Ones!</span>
+            <div className="rounded-t-lg bg-neutral py-4 pl-5 dark:bg-dark-neutral-border">
+              <p className="text-sm font-semibold leading-4 text-gray-1100 dark:text-gray-dark-1100">
+                Decryption Password{' '}
+                <span className="text-[10px] text-yellow">
+                  Strong Passwords Only—We Don’t Mess with Weak Ones!
+                </span>
               </p>
             </div>
             <form onSubmit={formik.handleSubmit}>
@@ -78,12 +87,16 @@ export default function DecryptionSetting({ user }: Props) {
                   placeholder="Decryption password"
                   label="Set Decryption Password"
                   size="lg"
-                  type='text'
+                  type="text"
                   isRequired
                   value={formik.values.decryptionPassword}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  error={formik.touched.decryptionPassword ? formik.errors.decryptionPassword : ''}
+                  error={
+                    formik.touched.decryptionPassword
+                      ? formik.errors.decryptionPassword
+                      : ''
+                  }
                   className="w-32"
                 />
                 <div className="flex items-center justify-between">
@@ -91,7 +104,7 @@ export default function DecryptionSetting({ user }: Props) {
                     type="button"
                     variant="secondary"
                     size="sm"
-                    className="rounded-md py-4 my-3 text-base hover:bg-transparent"
+                    className="my-3 rounded-md py-4 text-base hover:bg-transparent"
                     label="Suggest a Strong Password"
                     onClick={handleSuggestPassword}
                     disabled={isSubmitting}
@@ -101,7 +114,7 @@ export default function DecryptionSetting({ user }: Props) {
                     type="submit"
                     variant="primary"
                     size="sm"
-                    className="rounded-md py-4 w-32 text-base text-white"
+                    className="w-32 rounded-md py-4 text-base text-white"
                     label="Set password"
                     disabled={isSubmitting}
                     loading={isSubmitting}
@@ -119,7 +132,7 @@ export default function DecryptionSetting({ user }: Props) {
         <EhanchedRecoveryKeyModal
           title="Your Recovery Key 🔐: Don’t Lose It!"
           content="This is your recovery key to restore your decryption password. Make sure to copy it and store it in a safe place—preferably somewhere your cat or a coffee spill can’t reach! If you lose this key, we won’t be able to help you recover your password, so guard it like treasure."
-          className="md:w-[40%] sm:w-[20%]"
+          className="sm:w-1/5 md:w-2/5"
           onCancel={() => setShowRecoveryModal(false)}
           value={data}
         />
