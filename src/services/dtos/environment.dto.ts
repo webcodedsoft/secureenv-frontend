@@ -18,6 +18,8 @@ export interface EnvironmentDto {
   updatedAt: any
   deletedAt: any
   project: ProjectDaum
+
+  hasData?: boolean
 }
 export interface SaveEnvDto {
   environmentId: number
@@ -29,16 +31,16 @@ export interface SaveEnvDto {
 export type DecryptionPasswordDto = {
   environmentId: number
   projectId: number
-  password: string;
-};
+  password: string
+}
 
 export type CreateNoteDto = {
   text: string
   range: any
-  note: string;
+  note: string
   environmentId: number
   projectId: number
-};
+}
 
 export interface NoteType {
   data: NoteDaum[]
@@ -61,11 +63,36 @@ export interface NoteDaum {
   user: UserInfoDto
 }
 
-export interface Meta {
-  page: number
-  take: number
-  itemCount: number
-  pageCount: number
-  hasPreviousPage: boolean
-  hasNextPage: boolean
+export interface CreateEnvDto {
+  copyEnviromentId: number
+  environmentName: string
+  projectId: number
+}
+
+export interface EditEnvDto {
+  environmentId: number
+  environmentName: string
+  projectId: number
+}
+
+export interface AuditType {
+  data: AuditDaum[]
+  meta: PaginatedListMeta
+}
+
+export interface AuditDaum {
+  id: number
+  auditId: string
+  userId: number
+  projectId: number
+  workspaceId: number
+  enviromentId: number
+  action: string
+  added: string
+  removed: string
+  edited: string
+  createdAt: string
+  updatedAt: any
+  deletedAt: any
+  user: UserInfoDto
 }

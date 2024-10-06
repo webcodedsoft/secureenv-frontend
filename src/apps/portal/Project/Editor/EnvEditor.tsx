@@ -1,4 +1,7 @@
-import { useGetEnvironment } from 'common/queries-and-mutations/environment'
+import {
+  useGetEnvironment,
+  useGetProjectEnvs
+} from 'common/queries-and-mutations/environment'
 import { Loader } from 'components/Loader'
 import { Link, useParams } from 'react-router-dom'
 import CopyToClipboard from 'react-copy-to-clipboard'
@@ -9,16 +12,28 @@ import DefaultEditor from '.'
 import useDarkMode from 'common/hooks/useDarkMode'
 import { selectAccountDetails } from 'selectors/account-selector'
 import { useAppSelector } from 'store/hooks'
+import Dropdown from 'components/Dropdown'
 
 const EnvEditor = () => {
   const { envId, projectId } = useParams()
   const isDark = useDarkMode()
-  const { user } = useAppSelector(selectAccountDetails);
+  const { user } = useAppSelector(selectAccountDetails)
 
   const { data, isFetching, isRefetching } = useGetEnvironment(
     Number(projectId!),
     Number(envId!)
   )
+  const { data: envs } = useGetProjectEnvs(Number(data?.projectId))
+
+  const options = (envs ?? [])?.map((option) => ({
+    label: option.environmentName,
+    onClick: () =>
+      (window.location.href = `/workspace/${user.workspace.workspaceId}/project/${data?.project.projectSlug}/${data?.project.projectId}/env-editor/${option.enviromentId}`)
+    // onClick: () =>
+    //   navigate(
+    //     `/workspace/${user.workspace.workspaceId}/project/${data?.project.projectSlug}/${data?.project.projectId}/env-editor/${option.enviromentId}`
+    //   )
+  }))
 
   if (isFetching && !isRefetching) {
     return (
@@ -29,12 +44,19 @@ const EnvEditor = () => {
   }
 
   return (
-    <div>
-      <div className="flex items-end justify-between mb-8">
+    <div className="">
+      <div className="mb-8 flex items-end justify-between">
         <div className="flex flex-col items-start gap-x-3">
-          <h2 className="capitalize text-gray-1100 font-bold text-2xl leading-9 dark:text-gray-dark-1100 mb-3">
-            {data?.project.projectName} - {data?.environmentName}
-          </h2>
+          <div className="flex items-center gap-x-4 z-50">
+            <h2 className="mb-3 text-2xl font-bold capitalize leading-9 text-gray-1100 dark:text-gray-dark-1100">
+              {data?.project.projectName} - {data?.environmentName}{' '}
+              <Dropdown
+                options={options}
+                className="mr-8"
+                modalPosition="mr-6"
+              />
+            </h2>
+          </div>
           <div className="hidden md:block">
             <CopyToClipboard
               text={data?.enviromentId.toString() || ''}
@@ -46,14 +68,14 @@ const EnvEditor = () => {
             >
               <button
                 type="button"
-                className="flex gap-x-3 h-full w-full items-center justify-center text-gray-1100 dark:text-gray-dark-1100"
+                className="flex size-full items-center justify-center gap-x-3 text-gray-1100 dark:text-gray-dark-1100"
               >
                 Environment ID: #{data?.enviromentId.toString()}{' '}
                 <Icon
                   name={Icons.Copy}
                   height={20}
                   width={20}
-                  className="fill-gray-400 dark:fill-gray-dark-400 group-hover:fill-color-brands"
+                  className="fill-gray-400 group-hover:fill-color-brands dark:fill-gray-dark-400"
                 />
               </button>
             </CopyToClipboard>
@@ -69,38 +91,38 @@ const EnvEditor = () => {
             >
               <button
                 type="button"
-                className="flex gap-x-3 h-full w-full items-center justify-center text-gray-1100 dark:text-gray-dark-1100"
+                className="flex size-full items-center justify-center gap-x-3 text-gray-1100 dark:text-gray-dark-1100"
               >
                 Environment Slug: {data?.environmentSlug.toString()}{' '}
                 <Icon
                   name={Icons.Copy}
                   height={20}
                   width={20}
-                  className="fill-gray-400 dark:fill-gray-dark-400 group-hover:fill-color-brands"
+                  className="fill-gray-400 group-hover:fill-color-brands dark:fill-gray-dark-400"
                 />
               </button>
             </CopyToClipboard>
           </div>
         </div>
-        <Link to={`/workspace/${user.workspace.workspaceId}/project/${data?.project.projectSlug}/${data?.project.projectId}`} className='flex items-center gap-x-2 text-normal font-semibold text-gray-1100 mb-2 dark:text-gray-dark-1100'>
-          <Icon
-            name={Icons.LongBackArrow}
-            fill={isDark ? '#FFFFFF' : ''}
-          />
+        <Link
+          to={`/workspace/${user.workspace.workspaceId}/project/${data?.project.projectSlug}/${data?.project.projectId}`}
+          className="mb-2 flex items-center gap-x-2 text-normal font-semibold text-gray-1100 dark:text-gray-dark-1100"
+        >
+          <Icon name={Icons.LongBackArrow} fill={isDark ? '#FFFFFF' : ''} />
           Back
         </Link>
       </div>
 
       <DefaultEditor
         selectedLanguage={data?.project.language || 'env'}
-        isEnvLocked={data?.isLocked!}
-        isProjectLocked={data?.project.isLocked!}
+        isEnvLocked={!!data?.isLocked}
+        isProjectLocked={!!data?.project.isLocked}
         isRequireEncyptPassword={data?.project.isRequireEncyptPassword}
-        environmentId={+data?.enviromentId!}
-        projectId={+data?.project.projectId!}
-        envId={+data?.id!}
-        proId={+data?.projectId!}
-        currentEnvVersion={data?.commitCount!}
+        environmentId={Number(data?.enviromentId)}
+        projectId={Number(data?.project.projectId)}
+        envId={Number(data?.id)}
+        proId={Number(data?.projectId)}
+        currentEnvVersion={Number(data?.commitCount)}
         variable={data?.variables}
       />
     </div>

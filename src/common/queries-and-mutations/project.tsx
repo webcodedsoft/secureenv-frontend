@@ -1,10 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { Alert } from 'components/Toast';
-import { toast } from 'react-toastify';
-import { services } from 'services';
-import { Contributors, CreateProjectDto, ProjectDaum, ProjectDto, UpdateProjectDto } from 'services/dtos/project.dto';
-import { QueryParams } from 'types/general.type';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
+import { Alert } from 'components/Toast'
+import { toast } from 'react-toastify'
+import { services } from 'services'
+import {
+  Contributors,
+  CreateProjectDto,
+  ProjectDaum,
+  ProjectDto,
+  UpdateProjectDto
+} from 'services/dtos/project.dto'
+import { QueryParams } from 'types/general.type'
 
 export const useCreateProject = () => {
   const queryClient = useQueryClient()
@@ -18,12 +24,16 @@ export const useCreateProject = () => {
       },
       onError: (error: Error) => {
         toast.error(<Alert message={error.message} type="error" />)
-      },
-    },
+      }
+    }
   )
 }
 
-export const useGetProjects = ({ whereOptions, paginationOptions, enabled }: QueryParams) => {
+export const useGetProjects = ({
+  whereOptions,
+  paginationOptions,
+  enabled
+}: QueryParams) => {
   return useQuery<ProjectDto, AxiosError<Error>>(
     ['get-projects', paginationOptions, whereOptions],
     () => services.projectService.getProjects(whereOptions, paginationOptions),
@@ -35,8 +45,8 @@ export const useGetProjects = ({ whereOptions, paginationOptions, enabled }: Que
       staleTime: 4000,
       onError: (error: Error) => {
         toast.error(<Alert message={error.message} type="error" />)
-      },
-    },
+      }
+    }
   )
 }
 
@@ -49,29 +59,48 @@ export const useGetProject = (projectId: number, projectSlug: string) => {
       refetchOnWindowFocus: false,
       onError: (error: Error) => {
         toast.error(<Alert message={error.message} type="error" />)
-      },
-    },
+      }
+    }
   )
 }
 
-export const useGetProjectContributors = (projectId: number, projectSlug: string, pageNum: number, pageSize: number) => {
+export const useGetProjectContributors = (
+  projectId: number,
+  projectSlug: string,
+  pageNum: number,
+  pageSize: number,
+  enabled: boolean
+) => {
   return useQuery<Contributors, AxiosError<Error>>(
     ['get-project-contributors', projectId, projectSlug],
-    () => services.projectService.getProjectContributors(projectId, projectSlug, pageNum, pageSize),
+    () =>
+      services.projectService.getProjectContributors(
+        projectId,
+        projectSlug,
+        pageNum,
+        pageSize
+      ),
     {
+      enabled,
       keepPreviousData: false,
       refetchOnWindowFocus: false,
       onError: (error: Error) => {
         toast.error(<Alert message={error.message} type="error" />)
-      },
-    },
+      }
+    }
   )
 }
 
 export const useHandleContributor = () => {
   const queryClient = useQueryClient()
   return useMutation(
-    ({ projectId, accountId }: { projectId: number, accountId: number }): Promise<any> => {
+    ({
+      projectId,
+      accountId
+    }: {
+      projectId: number
+      accountId: number
+    }): Promise<any> => {
       return services.projectService.handleContributor(projectId, accountId)
     },
     {
@@ -82,15 +111,21 @@ export const useHandleContributor = () => {
       },
       onError: (error: Error) => {
         toast.error(<Alert message={error.message} type="error" />)
-      },
-    },
+      }
+    }
   )
 }
 
 export const useToggleProjectLock = () => {
   const queryClient = useQueryClient()
   return useMutation(
-    ({ projectId, isLocked }: { projectId: number, isLocked: boolean }): Promise<any> => {
+    ({
+      projectId,
+      isLocked
+    }: {
+      projectId: number
+      isLocked: boolean
+    }): Promise<any> => {
       return services.projectService.toggleProjectLock(projectId, isLocked)
     },
     {
@@ -100,15 +135,21 @@ export const useToggleProjectLock = () => {
       },
       onError: (error: Error) => {
         toast.error(<Alert message={error.message} type="error" />)
-      },
-    },
+      }
+    }
   )
 }
 
 export const useEditProject = () => {
   const queryClient = useQueryClient()
   return useMutation(
-    ({ projectId, updateProjectDto }: { projectId: number, updateProjectDto: UpdateProjectDto }): Promise<any> => {
+    ({
+      projectId,
+      updateProjectDto
+    }: {
+      projectId: number
+      updateProjectDto: UpdateProjectDto
+    }): Promise<any> => {
       return services.projectService.editProject(projectId, updateProjectDto)
     },
     {
@@ -117,7 +158,25 @@ export const useEditProject = () => {
       },
       onError: (error: Error) => {
         toast.error(<Alert message={error.message} type="error" />)
-      },
+      }
+    }
+  )
+}
+
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    ({ projectId }: { projectId: number }): Promise<any> => {
+      return services.projectService.deleteProject(projectId)
     },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['delete-project'])
+        queryClient.invalidateQueries(['get-project'])
+      },
+      onError: (error: Error) => {
+        toast.error(<Alert message={error.message} type="error" />)
+      }
+    }
   )
 }

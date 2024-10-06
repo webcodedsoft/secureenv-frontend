@@ -35,6 +35,9 @@ export interface ProjectDaum {
   environments: EnvironmentDto[]
   workspace: Workspace
   user: UserInfoDto
+  comparison: {
+    [key: string]: string[]
+  }[]
 }
 
 export interface Workspace {

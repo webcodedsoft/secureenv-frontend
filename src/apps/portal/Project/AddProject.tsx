@@ -1,6 +1,6 @@
 import useDarkMode from 'common/hooks/useDarkMode'
 import TextField from 'components/Forms/TextField'
-import { Icon, Icons } from 'components/Icon'
+import { Icon } from 'components/Icon'
 import { languages } from 'constants/languages'
 import { useFormik } from 'formik'
 import { useEffect, useState } from 'react'
@@ -13,7 +13,7 @@ import { useCreateProject } from 'common/queries-and-mutations/project'
 import { toast } from 'react-toastify'
 import { Alert } from 'components/Toast'
 
-const EhanchedConfirm = withCreatePortal(ConfirmModal);
+const EhanchedConfirm = withCreatePortal(ConfirmModal)
 
 export default function AddProject() {
   const isDarkMode = useDarkMode()
@@ -56,7 +56,12 @@ export default function AddProject() {
   useEffect(() => {
     if (isSuccess && !isError) {
       setIsSubmitting(false)
-      toast(<Alert type="success" message="Success! Your new project is live and ready to take over the world (or at least your to-do list)!" />)
+      toast(
+        <Alert
+          type="success"
+          message="Success! Your new project is live and ready to take over the world (or at least your to-do list)!"
+        />
+      )
       formik.resetForm()
       setShowConfirmModal(false)
     } else if (isError) {
@@ -64,27 +69,30 @@ export default function AddProject() {
     }
   }, [isSuccess, isError])
 
-
   return (
-    <div className="border bg-neutral-bg border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border rounded-2xl md:p-10 p-5 md:mx-40">
-      <div className="flex justify-between gap-x-5 flex-col">
+    <div className="rounded-2xl border border-neutral bg-neutral-bg p-5 md:mx-40 md:p-10 dark:border-dark-neutral-border dark:bg-dark-neutral-bg">
+      <div className="flex flex-col justify-between gap-x-5">
         <form onSubmit={formik.handleSubmit}>
           <div className="mb-12">
-            <p className="text-gray-1100 text-base leading-4 font-medium mb-[10px] dark:text-gray-dark-1100">
+            <p className="mb-[10px] text-base font-medium leading-4 text-gray-1100 dark:text-gray-dark-1100">
               Choose your platform
             </p>
             <div
-              className={`grid md:grid-cols-5 grid-cols-3 md:gap-10 gap-2 md:pl-1 lg:pl-20 rounded-lg border ${formik.errors.language
-                ? 'border-red'
-                : ' border-neutral dark:border-dark-neutral-border'
-                }`}
+              className={`grid grid-cols-3 gap-2 rounded-lg border md:grid-cols-5 md:gap-10 md:pl-1 lg:pl-20 ${
+                formik.errors.language
+                  ? 'border-red'
+                  : ' border-neutral dark:border-dark-neutral-border'
+              }`}
             >
               {languages.map((language) => (
                 <div
-                  className={`m-3 relative hover:bg-neutral dark:hover:bg-dark-neutral-border rounded-md md:w-32 w-20
-                  ${language.value === formik.values.language
+                  key={language.value}
+                  className={`relative m-3 w-20 rounded-md hover:bg-neutral md:w-32 dark:hover:bg-dark-neutral-border
+                  ${
+                    language.value === formik.values.language
                       ? 'bg-neutral dark:bg-dark-neutral-border'
-                      : ''}`}
+                      : ''
+                  }`}
                   role="button"
                   tabIndex={-1}
                   onKeyDown={() =>
@@ -101,21 +109,20 @@ export default function AddProject() {
                       width={60}
                       height={60}
                     />
-                    <p className="text-xs font-semibold text-dark-gray-0 leading-4 mb-[10px] dark:text-gray-dark-1100">
+                    <p className="text-dark-gray-0 mb-[10px] text-xs font-semibold leading-4 dark:text-gray-dark-1100">
                       {language.label}
                     </p>
                   </div>
                   {language.value === formik.values.language && (
-                    <div className="absolute rounded-full border border-dark-neutral-border -top-1 -right-1">
+                    <div className="absolute -right-1 -top-1 rounded-full border border-dark-neutral-border">
                       <img src={Star} />
                     </div>
                   )}
-
                 </div>
               ))}
             </div>
             {formik.errors.language && (
-              <p className="mt-2 text-xs text-red text-left">
+              <p className="mt-2 text-left text-xs text-red">
                 {formik.errors.language}
               </p>
             )}
@@ -152,18 +159,23 @@ export default function AddProject() {
             />
           </div>
           <div className="mb-[25px]">
-            <div className="w-full bg-neutral h-[1px] dark:bg-dark-neutral-border" />
+            <div className="h-px w-full bg-neutral dark:bg-dark-neutral-border" />
           </div>
           <div className="flex justify-end gap-x-10">
             <div className="flex items-center gap-x-3">
               <input
                 value={formik.values.isRequireEncyptPassword ? 'yes' : 'no'}
                 defaultChecked={formik.values.isRequireEncyptPassword}
-                className="checkbox checkbox-primary rounded border-2 w-[18px] h-[18px]"
+                className="checkbox checkbox-primary size-[18px] rounded border-2"
                 type="checkbox"
-                onChange={() => formik.setFieldValue('isRequireEncyptPassword', !formik.values.isRequireEncyptPassword)}
+                onChange={() =>
+                  formik.setFieldValue(
+                    'isRequireEncyptPassword',
+                    !formik.values.isRequireEncyptPassword
+                  )
+                }
               />
-              <span className="text-gray-500 leading-4 dark:text-gray-dark-500 text-[14px] max-w-[183px]">
+              <span className="max-w-[183px] text-[14px] leading-4 text-gray-500 dark:text-gray-dark-500">
                 Require decryption password to read and write
               </span>
             </div>
@@ -171,7 +183,7 @@ export default function AddProject() {
               type="submit"
               variant="primary"
               size="md"
-              className="mb-3 rounded-md py-4 text-base text-white w-fit"
+              className="mb-3 w-fit rounded-md py-4 text-base text-white"
               label="Create project"
               disabled={isSubmitting}
               loading={isSubmitting}
@@ -191,7 +203,7 @@ export default function AddProject() {
           onConfirm={handleSubmit}
           onCancel={() => setShowConfirmModal(false)}
           isSubmitting={isSubmitting}
-          className="md:w-[40%] sm:w-[20%]"
+          className="sm:w-1/5 md:w-2/5"
         />
       )}
     </div>

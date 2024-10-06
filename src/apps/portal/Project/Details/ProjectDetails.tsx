@@ -1,5 +1,4 @@
 import withCreatePortal from 'components/HOC/withCreatePortal'
-import Calender from '../../../../assets/icons/icon-calendar-1.svg'
 import DetailsCard from './DetailsCard'
 import Button from 'components/Forms/Button'
 import AddEnvModal from './AddEnvModal'
@@ -8,6 +7,7 @@ import ContributorCard from './ContributorCard'
 import InviteContributorModal from './InviteContributorModal'
 import Dropdown from 'components/Dropdown'
 import {
+  useDeleteProject,
   useGetProject,
   useGetProjectContributors,
   useToggleProjectLock
@@ -25,12 +25,12 @@ import { Alert } from 'components/Toast'
 import EditProjectModal from './EditProjectModal'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Icon, Icons } from 'components/Icon'
+import Paginator from 'components/Table/TableWidget/Paginator'
 
 const EnhancedAddEnvModal = withCreatePortal(AddEnvModal)
 const EnhancedInviteContributorModal = withCreatePortal(InviteContributorModal)
 const EhanchedConfirm = withCreatePortal(ConfirmModal)
 const EhanchedEditProjectModal = withCreatePortal(EditProjectModal)
-
 export default function ProjectDetails() {
   const [showAddEnv, setShowAddEnv] = useState(false)
   const [showInvite, setShowInvite] = useState(false)
@@ -38,16 +38,33 @@ export default function ProjectDetails() {
   const { user } = useAppSelector(selectAccountDetails)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false)
   const [showEditProjectModal, setShowEditProjectModal] = useState(false)
+  const [page, setPage] = useState(1)
+  const [itemPerPage, setItemPerPage] = useState(10)
+  const [isExecutingSearch, setIsExecutingSearch] = useState<boolean>(true)
 
   const { data, isFetching } = useGetProject(+projectId!, projectSlug!)
   const { data: contributors } = useGetProjectContributors(
     +projectId!,
     projectSlug!,
-    1,
-    22
+    page,
+    itemPerPage,
+    isExecutingSearch
   )
+
+  useEffect(() => {
+    if (!isFetching && isExecutingSearch) {
+      setIsExecutingSearch(false)
+    }
+  }, [isFetching, isExecutingSearch])
+
   const { mutate, isSuccess, isError } = useToggleProjectLock()
+  const {
+    mutate: deleteProject,
+    isSuccess: isDeleteSuccess,
+    isError: isDeleteError
+  } = useDeleteProject()
 
   const handleLock = () => {
     mutate({ projectId: Number(projectId!), isLocked: !data?.isLocked })
@@ -67,6 +84,46 @@ export default function ProjectDetails() {
       setIsSubmitting(false)
     }
   }, [isSuccess, isError])
+
+  useEffect(() => {
+    if (isDeleteSuccess && !isDeleteError) {
+      setIsSubmitting(false)
+      setShowConfirmModal(false)
+      toast(<Alert type="success" message="Project successfully deleted!" />)
+    } else if (isDeleteError) {
+      setIsSubmitting(false)
+    }
+  }, [isDeleteSuccess, isDeleteError])
+
+  const handleDelete = () => {
+    deleteProject({ projectId: Number(projectId) })
+  }
+
+  const getPageStatus = (pageNum: number, totalPages: number) => {
+    const hasNextPage = pageNum < totalPages
+    const hasPreviousPage = pageNum > 1
+
+    return {
+      hasNextPage,
+      hasPreviousPage
+    }
+  }
+
+  const goToNextPage = () => {
+    if (page) {
+      const nextPageValue = page ? page + 1 : 2
+      setPage(nextPageValue)
+      setIsExecutingSearch(true)
+    }
+  }
+
+  const goToPreviousPage = () => {
+    if (page > 1) {
+      const previousPageValue = page - 1
+      setPage(previousPageValue)
+      setIsExecutingSearch(true)
+    }
+  }
 
   if (isFetching) {
     return (
@@ -131,7 +188,11 @@ export default function ProjectDetails() {
                       label: `${data?.isLocked ? 'Unlocked' : 'Lock'}`,
                       onClick: () => setShowConfirmModal(true)
                     },
-                    { label: 'Delete', onClick: () => { }, isDlete: true }
+                    {
+                      label: 'Delete',
+                      onClick: () => setShowConfirmDeleteModal(true),
+                      isDlete: true
+                    }
                   ]}
                   className="mr-8"
                   modalPosition="mr-6"
@@ -140,29 +201,33 @@ export default function ProjectDetails() {
             </div>
           </div>
           <div className="flex items-center gap-x-2">
-            <img src={Calender} alt="calendar icon" />
+            <Icon name={Icons.Calendar} />
             <time className="text-xs text-gray-500">
-              {format(new Date(data?.createdAt!), 'MMM dd yy')}{' '}
-              {` ${data?.updatedAt
-                  ? `- ${format(new Date(data?.updatedAt!), 'MMM dd yy')}`
+              {format(new Date(data!.createdAt), 'MMM dd yy')}{' '}
+              {`${
+                data!.updatedAt
+                  ? `- ${format(new Date(data!.updatedAt), 'MMM dd yy')}`
                   : ``
-                } `}
+              } `}
             </time>
           </div>
         </div>
       </div>
-      <div className="mb-[33px] grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <div className="mb-[33px] grid grid-cols-1 gap-6 xl:grid-cols-4">
         {(data?.environments ?? [])
+          // .splice(1,2)
           .sort((a, b) => a.id - b.id)
           .map((env) => (
             <DetailsCard
               key={env.id}
               label={env.environmentName}
               envId={env.enviromentId}
+              envSlug={env.environmentSlug}
               commitCount={env.commitCount}
-              workspaceId={Number(data?.workspace?.workspaceId!)}
-              projectId={Number(data?.projectId!)}
-              projectSlug={data?.projectSlug!}
+              workspaceId={Number(data?.workspace?.workspaceId)}
+              projectId={Number(data?.projectId)}
+              projectSlug={data?.projectSlug ?? ''}
+              comparison={data?.comparison}
             />
           ))}
       </div>
@@ -205,7 +270,7 @@ export default function ProjectDetails() {
                 avatarColor={contributor.avatarColor}
                 contributorId={contributor.accountId}
                 currentUserId={user.accountId}
-                ownerId={data?.user.accountId!}
+                ownerId={data?.user.accountId ?? null}
                 projectId={Number(data?.projectId)!}
               />
             ))}
@@ -223,10 +288,40 @@ export default function ProjectDetails() {
             )}
           </div>
         )}
-        {/* TODO!: To add pagination here */}
+        {(contributors?.pageNum ?? 0) > 1 && (
+          <div className="mt-5 p-5">
+            <Paginator
+              numberOfPages={contributors!.totalPages}
+              page={1}
+              hasNext={
+                getPageStatus(
+                  contributors?.pageNum ?? 0,
+                  contributors?.totalPages ?? 0
+                ).hasNextPage
+              }
+              hasPrevious={
+                getPageStatus(
+                  contributors?.pageNum ?? 0,
+                  contributors?.totalPages ?? 0
+                ).hasPreviousPage
+              }
+              goToNextPage={goToNextPage}
+              goToPreviousPage={goToPreviousPage}
+              numberOfItemsPerPage={10}
+              setNumberOfItemsPerPage={(items_per_page) => {
+                setItemPerPage(items_per_page)
+                setIsExecutingSearch(true)
+              }}
+              showPageNumber={false}
+            />
+          </div>
+        )}
       </div>
       {showAddEnv && (
-        <EnhancedAddEnvModal onClose={() => setShowAddEnv(false)} />
+        <EnhancedAddEnvModal
+          projectId={data?.id}
+          onClose={() => setShowAddEnv(false)}
+        />
       )}
       {showInvite && (
         <EnhancedInviteContributorModal
@@ -239,8 +334,8 @@ export default function ProjectDetails() {
 
       {showConfirmModal && (
         <EhanchedConfirm
-          title={`Are you sure you want to ${data?.isLocked ? 'unlock' : 'lock'
-            } this project? 🛑`}
+          title={`Are you sure you want to
+          ${data?.isLocked ? 'unlock' : 'lock'} this project? 🛑`}
           content={
             data?.isLocked
               ? 'Project unlocked! Now you’re free to make changes and edit environments again. Go wild!'
@@ -250,6 +345,17 @@ export default function ProjectDetails() {
           cancelText="No"
           onConfirm={handleLock}
           onCancel={() => setShowConfirmModal(false)}
+          isSubmitting={isSubmitting}
+        />
+      )}
+      {showConfirmDeleteModal && (
+        <EhanchedConfirm
+          title={`Are you sure you want to delete this project? 🛑`}
+          content="Whoa there! Deleting this project means poof—all the environments and it's data will vanish into the abyss, never to return. And yep, the environment itself? Gone like it never existed. Sure you wanna do that?"
+          actionText="Yes, continue"
+          cancelText="No"
+          onConfirm={handleDelete}
+          onCancel={() => setShowConfirmDeleteModal(false)}
           isSubmitting={isSubmitting}
         />
       )}

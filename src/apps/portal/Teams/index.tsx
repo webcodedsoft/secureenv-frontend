@@ -1,16 +1,19 @@
-import Button, { ButtonProps } from 'components/Forms/Button';
-import withCreatePortal from 'components/HOC/withCreatePortal';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import AddTeamModal from './AddTeamModal';
-import Filter from 'components/Filter';
-import TextField from 'components/Forms/TextField';
-import { Icon, Icons } from 'components/Icon';
-import { useDeleteTeamMember, useGetTeamList } from 'common/queries-and-mutations/team';
-import { useSearchParams } from 'react-router-dom';
-import { selectAccountDetails } from 'selectors/account-selector';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import useDebounce from 'common/hooks/useDebounce';
-import { ListOrder, PaginatedListMeta } from 'types/general.type';
+import Button, { ButtonProps } from 'components/Forms/Button'
+import withCreatePortal from 'components/HOC/withCreatePortal'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import AddTeamModal from './AddTeamModal'
+import Filter from 'components/Filter'
+import TextField from 'components/Forms/TextField'
+import { Icon, Icons } from 'components/Icon'
+import {
+  useDeleteTeamMember,
+  useGetTeamList
+} from 'common/queries-and-mutations/team'
+import { useSearchParams } from 'react-router-dom'
+import { selectAccountDetails } from 'selectors/account-selector'
+import { useAppDispatch, useAppSelector } from 'store/hooks'
+import useDebounce from 'common/hooks/useDebounce'
+import { ListOrder, PaginatedListMeta } from 'types/general.type'
 import {
   createColumnHelper,
   flexRender,
@@ -18,24 +21,24 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
-import { TeamDaum } from 'services/dtos/team.dto';
-import AvatarInitial from 'components/Avatar/Initial';
-import { format } from 'date-fns';
-import { Loader } from 'components/Loader';
-import clsx from 'clsx';
-import Paginator from 'components/Table/TableWidget/Paginator';
-import { AccountStatus, RolesEnum } from 'types/user.type';
-import ConfirmModal from 'components/Modal/ConfirmModal';
-import { logout } from 'thunks/account-thunk';
-import { toast } from 'react-toastify';
-import { Alert } from 'components/Toast';
+import { TeamDaum } from 'services/dtos/team.dto'
+import AvatarInitial from 'components/Avatar/Initial'
+import { format } from 'date-fns'
+import { Loader } from 'components/Loader'
+import clsx from 'clsx'
+import Paginator from 'components/Table/TableWidget/Paginator'
+import { AccountStatus, RolesEnum } from 'types/user.type'
+import ConfirmModal from 'components/Modal/ConfirmModal'
+import { logout } from 'thunks/account-thunk'
+import { toast } from 'react-toastify'
+import { Alert } from 'components/Toast'
 
-const EhancedAddTeamModal = withCreatePortal(AddTeamModal);
-const EhanchedConfirm = withCreatePortal(ConfirmModal);
+const EhancedAddTeamModal = withCreatePortal(AddTeamModal)
+const EhanchedConfirm = withCreatePortal(ConfirmModal)
 export default function ManageTeam() {
-  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false)
   const [sorting, setSorting] = useState<SortingState>([])
   const [urlParams, setUrlParams] = useSearchParams()
   const [isExecutingSearch, setIsExecutingSearch] = useState<boolean>(true)
@@ -47,7 +50,7 @@ export default function ManageTeam() {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [removedUserId, setRemovedUserId] = useState<null | number>()
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
   const { mutate, isSuccess, isError } = useDeleteTeamMember()
 
   const debounceSearch = useDebounce(searchQueryString, 1300)
@@ -56,7 +59,7 @@ export default function ManageTeam() {
     return {
       page: +currentPage,
       take: +numberOfItemsPerPage,
-      order: ListOrder.DESC,
+      order: ListOrder.DESC
     }
   }, [currentPage, numberOfItemsPerPage])
 
@@ -65,23 +68,23 @@ export default function ManageTeam() {
     if (trimmedSearch.length > 2) {
       return {
         search_query: trimmedSearch,
-        status,
+        status
       }
     }
     return {
       search_query: '',
-      status,
+      status
     }
   }, [searchQueryString, status])
 
   const {
     data: teamList,
     isFetching,
-    refetch,
+    refetch
   } = useGetTeamList({
     whereOptions: computedWhereOptions(),
     paginationOptions: getPaginationParams(),
-    enabled: isExecutingSearch,
+    enabled: isExecutingSearch
   })
 
   useEffect(() => {
@@ -97,19 +100,20 @@ export default function ManageTeam() {
     }
   }, [debounceSearch, refetch])
 
-
   const columnHelper = createColumnHelper<TeamDaum>()
 
   const determineActionBtn = (member: TeamDaum) => {
-    const isCurrentUser = user.id === member.id;
-    const isAdmin = user.accountRole === RolesEnum.ADMIN;
+    const isCurrentUser = user.id === member.id
+    const isAdmin = user.accountRole === RolesEnum.ADMIN
 
     const buttonProps: ButtonProps = {
-      type: "button",
-      variant: "outline",
-      size: "sm",
-      className: `rounded-md text-base w-32 ${isCurrentUser ? "text-white bg-red" : "text-red"}`,
-      label: isCurrentUser ? "Leave" : "Remove",
+      type: 'button',
+      variant: 'outline',
+      size: 'sm',
+      className: `rounded-md text-base w-32 ${
+        isCurrentUser ? 'text-white bg-red' : 'text-red'
+      }`,
+      label: isCurrentUser ? 'Leave' : 'Remove',
       onClick: () => {
         setShowConfirmModal(true)
         setRemovedUserId(member.id)
@@ -117,79 +121,113 @@ export default function ManageTeam() {
       icon: (
         <Icon
           name={Icons.Cancel}
-          fill={isCurrentUser ? "#FFFFFF" : "#e23738"}
+          fill={isCurrentUser ? '#FFFFFF' : '#e23738'}
         />
-      ),
-    };
+      )
+    }
 
-    return (isAdmin || isCurrentUser) && <Button {...buttonProps} />;
-  };
+    return (isAdmin || isCurrentUser) && <Button {...buttonProps} />
+  }
 
   const columns = [
     columnHelper.accessor((row) => row.name, {
       enableSorting: true,
       id: 'name',
       cell: (info) => (
-        <div className='flex items-center gap-2'>
-          <div className="rounded-full overflow-hidden">
+        <div className="flex items-center gap-2">
+          <div className="overflow-hidden rounded-full">
             <AvatarInitial
-              name={info.row.original.accountStatus === AccountStatus.ACTIVATED ? info.getValue() : info.row.original.accountStatus}
+              name={
+                info.row.original.accountStatus === AccountStatus.ACTIVATED
+                  ? info.getValue()
+                  : info.row.original.accountStatus
+              }
               avatarColor={info.row.original.avatarColor}
-              className="w-10 h-10"
+              className="size-10"
             />
           </div>
           <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">
-            {info.row.original.accountStatus === AccountStatus.ACTIVATED ? info.getValue() : info.row.original.accountStatus}
+            {info.row.original.accountStatus === AccountStatus.ACTIVATED
+              ? info.getValue()
+              : info.row.original.accountStatus}
           </p>
         </div>
       ),
-      header: () => <span className="text-xs font-semibold text-[#848484]">Name</span>,
+      header: () => (
+        <span className="text-xs font-semibold text-[#848484]">Name</span>
+      )
     }),
     columnHelper.accessor((row) => row.emailAddress, {
       enableSorting: true,
       id: 'emailAddress',
-      cell: (info) => <span className="text-xs font-normal">{info.getValue()}</span>,
-      header: () => <span className="text-xs font-semibold text-[#848484]">Email Address</span>,
+      cell: (info) => (
+        <span className="text-xs font-normal">{info.getValue()}</span>
+      ),
+      header: () => (
+        <span className="text-xs font-semibold text-[#848484]">
+          Email Address
+        </span>
+      )
     }),
     columnHelper.accessor((row) => row.accountRole, {
       enableSorting: true,
       id: 'accountRole',
-      cell: (info) => <span className="text-xs font-normal">{info.getValue()}</span>,
-      header: () => <span className="text-xs font-semibold text-[#848484]">Role</span>,
+      cell: (info) => (
+        <span className="text-xs font-normal">{info.getValue()}</span>
+      ),
+      header: () => (
+        <span className="text-xs font-semibold text-[#848484]">Role</span>
+      )
     }),
     columnHelper.accessor((row) => row.accountStatus, {
       enableSorting: true,
       id: 'accountStatus',
       cell: (info) => (
-        <span className="text-gray-1100 text-xs dark:text-gray-dark-1100">
+        <span className="text-xs text-gray-1100 dark:text-gray-dark-1100">
           <div className="flex items-center gap-x-2">
-            <div className={`w-2 h-2 rounded-full ${info.getValue() === AccountStatus.ACTIVATED ? 'bg-green' : 'bg-red'}`}></div>
-            <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">{info.getValue()}</p>
+            <div
+              className={`size-2 rounded-full ${
+                info.getValue() === AccountStatus.ACTIVATED
+                  ? 'bg-green'
+                  : 'bg-red'
+              }`}
+            ></div>
+            <p className="text-normal text-gray-1100 dark:text-gray-dark-1100">
+              {info.getValue()}
+            </p>
           </div>
         </span>
       ),
-      header: () => <span className="text-xs font-semibold text-[#848484]">Status</span>,
+      header: () => (
+        <span className="text-xs font-semibold text-[#848484]">Status</span>
+      )
     }),
     columnHelper.accessor((row) => row.createdAt, {
       enableSorting: false,
       id: 'createdAt',
-      cell: (info) => <span className="text-xs font-normal">{format(new Date(info.getValue()), 'dd MMM yyyy')}</span>,
-      header: () => <span className="text-xs font-semibold text-[#848484]">Date Added</span>,
+      cell: (info) => (
+        <span className="text-xs font-normal">
+          {format(new Date(info.getValue()), 'dd MMM yyyy')}
+        </span>
+      ),
+      header: () => (
+        <span className="text-xs font-semibold text-[#848484]">Date Added</span>
+      )
     }),
     columnHelper.accessor((row) => row.id, {
       enableSorting: false,
       id: 'id',
-      cell: (info) => (
-        <div>
-          {determineActionBtn(info.row.original)}
-        </div>
-      ),
-      header: () => <span className="text-xs font-semibold text-[#848484]">Action</span>,
-    }),
+      cell: (info) => <div>{determineActionBtn(info.row.original)}</div>,
+      header: () => (
+        <span className="text-xs font-semibold text-[#848484]">Action</span>
+      )
+    })
   ]
 
   const data = useMemo<TeamDaum[]>(() => {
-    const normalizedResult: TeamDaum[] = (teamList?.data ?? []).map((item) => item)
+    const normalizedResult: TeamDaum[] = (teamList?.data ?? []).map(
+      (item) => item
+    )
     return normalizedResult
   }, [teamList])
 
@@ -199,7 +237,7 @@ export default function ManageTeam() {
     data,
     columns,
     state: {
-      sorting,
+      sorting
     },
     // initialState: {
     //   pagination: {
@@ -209,7 +247,7 @@ export default function ManageTeam() {
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
   })
 
   const handleFilter = (currentTab: string) => {
@@ -272,16 +310,16 @@ export default function ManageTeam() {
   }, [isSuccess, isError])
 
   const modalText = useMemo(() => {
-    const isCurrentUser = removedUserId === user.id;
+    const isCurrentUser = removedUserId === user.id
     return {
       title: isCurrentUser
-        ? "Are you absolutely sure you want to delete your account? 🛑"
+        ? 'Are you absolutely sure you want to delete your account? 🛑'
         : "Are you absolutely sure you want to delete this user's account? 🛑",
       content: isCurrentUser
-        ? "Warning: This is a one-way trip! Hit the delete button, and poof—your data’s gone forever, and there’s no turning back. Still want to go through with it?"
-        : "Careful now! Once you delete this, it’s like the user's account data went on vacation and forgot to come back—no logging in, no take-backs. Are you sure?",
-    };
-  }, [removedUserId]);
+        ? 'Warning: This is a one-way trip! Hit the delete button, and poof—your data’s gone forever, and there’s no turning back. Still want to go through with it?'
+        : "Careful now! Once you delete this, it’s like the user's account data went on vacation and forgot to come back—no logging in, no take-backs. Are you sure?"
+    }
+  }, [removedUserId])
 
   if (isFetching) {
     return (
@@ -293,10 +331,10 @@ export default function ManageTeam() {
 
   return (
     <div>
-      <div className='smd:mr-[70rem]'>
-        <div className="flex items-end justify-between mb-[25px]">
+      <div className="smd:mr-[70rem]">
+        <div className="mb-[25px] flex items-end justify-between">
           <div>
-            <h2 className="capitalize text-gray-1100 font-bold text-[28px] leading-[35px] dark:text-gray-dark-1100 mb-[13px]">
+            <h2 className="mb-[13px] text-[28px] font-bold capitalize leading-[35px] text-gray-1100 dark:text-gray-dark-1100">
               Manage Team
             </h2>
           </div>
@@ -305,13 +343,13 @@ export default function ManageTeam() {
               type="button"
               variant="primary"
               size="md"
-              className="mb-3 rounded-md py-4 text-base text-white w-fit"
+              className="mb-3 w-fit rounded-md py-4 text-base text-white"
               label="Invite Teams"
               onClick={() => setShowInviteModal(true)}
             ></Button>
           </div>
         </div>
-        <div className="flex items-center justify-between gap-5 mb-[27px]">
+        <div className="mb-[27px] flex items-center justify-between gap-5">
           <TextField
             name="search_query"
             placeholder="Search team"
@@ -332,11 +370,12 @@ export default function ManageTeam() {
                 { value: RolesEnum.COLLABORATOR, label: 'Collaborator' },
                 { value: RolesEnum.ADMIN, label: 'Admin' }
               ]}
-              onSelect={(val) => handleFilter(val)} />
+              onSelect={(val) => handleFilter(val)}
+            />
           </div>
         </div>
-        <div className="rounded-2xl border border-neutral bg-neutral-bg dark:border-dark-neutral-border dark:bg-dark-neutral-bg overflow-x-scroll scrollbar-hide p-[25px] mb-[25px]">
-          <div className="flex items-center justify-between pb-4 border-neutral border-b mb-3 dark:border-dark-neutral-border">
+        <div className="mb-[25px] overflow-x-scroll rounded-2xl border border-neutral bg-neutral-bg p-[25px] scrollbar-hide dark:border-dark-neutral-border dark:bg-dark-neutral-bg">
+          <div className="mb-3 flex items-center justify-between border-b border-neutral pb-4 dark:border-dark-neutral-border">
             <p className="text-subtitle-semibold font-semibold text-gray-1100 dark:text-gray-dark-1100">
               Teams
             </p>
@@ -344,17 +383,23 @@ export default function ManageTeam() {
           <table className="w-full min-w-[900px]">
             {table.getRowModel().rows.length >= 1 && (
               <tbody className="">
-                {table.getRowModel().rows.map((row, cellIndex) => (
-                  <tr key={row.id} className="border-b text-normal text-gray-1100 border-neutral dark:border-dark-neutral-border dark:text-gray-dark-1100">
+                {table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="border-b border-neutral text-normal text-gray-1100 dark:border-dark-neutral-border dark:text-gray-dark-1100"
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
                         className={clsx({
-                          'py-3': true,
+                          'py-3': true
                           // [className]: className,
                         })}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -381,10 +426,10 @@ export default function ManageTeam() {
                 setUrlParams(urlParams)
                 setIsExecutingSearch(true)
               }}
+              showPageNumber={false}
             />
           </div>
         </div>
-
       </div>
       {showInviteModal && (
         <EhancedAddTeamModal onClose={() => setShowInviteModal(false)} />

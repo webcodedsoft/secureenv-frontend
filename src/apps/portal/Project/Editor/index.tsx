@@ -7,9 +7,12 @@ import { compareValue, maskData } from 'utils'
 import { toast } from 'react-toastify'
 import { Action, Alert } from 'components/Toast'
 import EditorDataProtection from './EditorDataProtection'
-import { useSaveEnv, useToggleEnvLock } from 'common/queries-and-mutations/environment'
-import NoteList from './NoteList'
+import {
+  useSaveEnv,
+  useToggleEnvLock
+} from 'common/queries-and-mutations/environment'
 import { NoteDaum } from 'services/dtos/environment.dto'
+import EditorSidebar from './EditorSidebar'
 
 type IProps = {
   selectedLanguage: string
@@ -34,36 +37,57 @@ export default function DefaultEditor({
   currentEnvVersion,
   envId,
   proId,
-  variable,
+  variable
 }: IProps) {
   const editorRef = useRef<any>(null)
   const monacoRef = useRef<any>(null)
   const isDark = useDarkMode()
   const [language, setLanguage] = useState<string>('')
   const [value, setValue] = useState<string>(variable || '')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [tempValue, setTempValue] = useState<string>('')
-  const [isAccessGrant, setIsAccessGrant] = useState<boolean>(isRequireEncyptPassword)
+  const [isAccessGrant, setIsAccessGrant] = useState<boolean>(
+    isRequireEncyptPassword
+  )
   const [isMasked, setIsMasked] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedText, setSelectedText] = useState<{ text: any, range: any } | null>(null);
-  const [decorationIds, setDecorationIds] = useState([]);
+  const [selectedText, setSelectedText] = useState<{
+    text: any
+    range: any
+  } | null>(null)
+  const [decorationIds, setDecorationIds] = useState([])
 
-  const { mutate: toggleEnvLock, isSuccess: isLockSuccess, isError: isLockError, data: envRes } = useToggleEnvLock()
-  const { mutate: saveEnv, isSuccess: isSaveSuccess, isError: isSaveError } = useSaveEnv()
-
+  const {
+    mutate: toggleEnvLock,
+    isSuccess: isLockSuccess,
+    isError: isLockError,
+    data: envRes
+  } = useToggleEnvLock()
+  const {
+    mutate: saveEnv,
+    isSuccess: isSaveSuccess,
+    isError: isSaveError
+  } = useSaveEnv()
 
   const getFileType = useCallback(() => {
-    const fileExtension = languages.find(l => l.value === selectedLanguage)?.envType
+    const fileExtension = languages.find((l) => l.value === selectedLanguage)
+      ?.envType
     switch (fileExtension) {
-      case '.env': return 'env'
-      case 'appsettings.json': return 'json'
-      case 'application.properties': return 'properties'
-      case 'application.conf': return 'conf'
-      default: return 'env'
+      case '.env':
+        return 'env'
+      case 'appsettings.json':
+        return 'json'
+      case 'application.properties':
+        return 'properties'
+      case 'application.conf':
+        return 'conf'
+      default:
+        return 'env'
     }
   }, [selectedLanguage])
 
-  const handleFormat = () => editorRef.current?.getAction('editor.action.formatDocument')?.run()
+  const handleFormat = () =>
+    editorRef.current?.getAction('editor.action.formatDocument')?.run()
   const handleUndo = () => editorRef.current?.trigger('keyboard', 'undo', null)
   const handleRedo = () => editorRef.current?.trigger('keyboard', 'redo', null)
   const handleReplace = (text: any) => setValue(text)
@@ -71,7 +95,7 @@ export default function DefaultEditor({
 
   const handleMerge = (newData: any) => {
     // Update the editor's value with the merged result
-    setValue(value + "\n" + newData);
+    setValue(value + '\n' + newData)
   }
 
   const handleUpload = (text: any) => {
@@ -88,9 +112,9 @@ export default function DefaultEditor({
         {
           autoClose: false,
           closeOnClick: false,
-          position: 'top-center',
-        },
-      );
+          position: 'top-center'
+        }
+      )
       return
     }
     setValue(text)
@@ -99,7 +123,10 @@ export default function DefaultEditor({
   const handleSave = () => {
     const currentVal = editorRef.current.getValue()
     const payload = {
-      currentEnvVersion, env: currentVal, environmentId, projectId
+      currentEnvVersion,
+      env: currentVal,
+      environmentId,
+      projectId
     }
     saveEnv(payload)
   }
@@ -108,120 +135,133 @@ export default function DefaultEditor({
     toggleEnvLock({ environmentId, projectId, isEnvLocked: !isEnvLocked })
   }
 
-  const registerLanguagesAndThemes = useCallback((monaco: Monaco) => {
-    // Register custom languages for environment formats
-    monaco.languages.register({ id: 'env' })
-    monaco.languages.register({ id: 'json' })
-    monaco.languages.register({ id: 'properties' })
-    monaco.languages.register({ id: 'conf' })
+  const registerLanguagesAndThemes = useCallback(
+    (monaco: Monaco) => {
+      // Register custom languages for environment formats
+      monaco.languages.register({ id: 'env' })
+      monaco.languages.register({ id: 'json' })
+      monaco.languages.register({ id: 'properties' })
+      monaco.languages.register({ id: 'conf' })
 
-    // Set syntax tokens for each language
-    const languageTokens = {
-      env: {
-        tokenizer: {
-          root: [
-            [/#.*$/, 'comment'], // Comments
-            [/^\s*\w+\s*=.*$/, 'variable'] // Key-value pairs
-          ]
-        }
-      },
-      properties: {
-        tokenizer: {
-          root: [
-            [/^#.*$/, 'comment'], // Comments
-            [/^\s*[\w\.]+\s*=.*$/, 'variable'] // Key-value pairs
-          ]
-        }
-      },
-      conf: {
-        tokenizer: {
-          root: [
-            [/^#.*$/, 'comment'], // Comments
-            [/^\s*\w+\s*=.*$/, 'variable'] // Key-value pairs
-          ]
+      // Set syntax tokens for each language
+      const languageTokens = {
+        env: {
+          tokenizer: {
+            root: [
+              [/#.*$/, 'comment'], // Comments
+              [/^\s*\w+\s*=.*$/, 'variable'] // Key-value pairs
+            ]
+          }
+        },
+        properties: {
+          tokenizer: {
+            root: [
+              [/^#.*$/, 'comment'], // Comments
+              // eslint-disable-next-line no-useless-escape
+              [/^\s*[\w\.]+\s*=.*$/, 'variable'] // Key-value pairs
+            ]
+          }
+        },
+        conf: {
+          tokenizer: {
+            root: [
+              [/^#.*$/, 'comment'], // Comments
+              [/^\s*\w+\s*=.*$/, 'variable'] // Key-value pairs
+            ]
+          }
         }
       }
-    }
 
-    Object.keys(languageTokens).forEach(lang =>
-      monaco.languages.setMonarchTokensProvider(lang, languageTokens[lang as keyof typeof languageTokens])
-    )
+      Object.keys(languageTokens).forEach((lang) =>
+        monaco.languages.setMonarchTokensProvider(
+          lang,
+          languageTokens[lang as keyof typeof languageTokens]
+        )
+      )
 
-    // Define custom themes
-    const baseTheme = isDark ? 'vs-dark' : 'vs' // Use 'vs' for light theme
+      // Define custom themes
+      const baseTheme = isDark ? 'vs-dark' : 'vs' // Use 'vs' for light theme
 
-    const commonThemeRules = { comment: '888888', variable: 'FFEB3B' }
+      const commonThemeRules = { comment: '888888', variable: 'FFEB3B' }
 
-    const themes = {
-      envTheme: [{ token: 'variable', foreground: '9CDCFE' }],
-      jsonTheme: [{ token: 'variable', foreground: 'FFEB3B' }],
-      propertiesTheme: [{ token: 'variable', foreground: 'FFEB3B' }],
-      confTheme: [{ token: 'variable', foreground: 'C5E1A5' }]
-    }
+      const themes = {
+        envTheme: [{ token: 'variable', foreground: '9CDCFE' }],
+        jsonTheme: [{ token: 'variable', foreground: 'FFEB3B' }],
+        propertiesTheme: [{ token: 'variable', foreground: 'FFEB3B' }],
+        confTheme: [{ token: 'variable', foreground: 'C5E1A5' }]
+      }
 
-    // Suggestions
-    // monaco.languages.registerCompletionItemProvider('env', {
-    //   provideCompletionItems: (model: any, position: any) => {
-    //     // Define custom suggestions
-    //     const suggestions = [
-    //       {
-    //         label: 'PORT',
-    //         kind: monaco.languages.CompletionItemKind.Variable,
-    //         insertText: 'PORT=',
-    //         detail: 'Define the port number for the application',
-    //         documentation: 'The port number that your application will run on.'
-    //       },
-    //       {
-    //         label: 'DATABASE_URL',
-    //         kind: monaco.languages.CompletionItemKind.Variable,
-    //         insertText: 'DATABASE_URL=',
-    //         detail: 'Database connection URL',
-    //         documentation: 'URL used to connect to the database.'
-    //       },
-    //       {
-    //         label: 'NODE_ENV',
-    //         kind: monaco.languages.CompletionItemKind.Enum,
-    //         insertText: 'NODE_ENV=production',
-    //         detail: 'Define the environment',
-    //         documentation: 'Can be set to development, production, or test.'
-    //       },
-    //       {
-    //         label: 'SIKIRU',
-    //         kind: monaco.languages.CompletionItemKind.Enum,
-    //         insertText: 'SIKIRU=production',
-    //         detail: 'Define my name',
-    //         documentation: 'Can be set to development, production, or test.'
-    //       }
-    //     ]
+      // Suggestions
+      // monaco.languages.registerCompletionItemProvider('env', {
+      //   provideCompletionItems: (model: any, position: any) => {
+      //     // Define custom suggestions
+      //     const suggestions = [
+      //       {
+      //         label: 'PORT',
+      //         kind: monaco.languages.CompletionItemKind.Variable,
+      //         insertText: 'PORT=',
+      //         detail: 'Define the port number for the application',
+      //         documentation: 'The port number that your application will run on.'
+      //       },
+      //       {
+      //         label: 'DATABASE_URL',
+      //         kind: monaco.languages.CompletionItemKind.Variable,
+      //         insertText: 'DATABASE_URL=',
+      //         detail: 'Database connection URL',
+      //         documentation: 'URL used to connect to the database.'
+      //       },
+      //       {
+      //         label: 'NODE_ENV',
+      //         kind: monaco.languages.CompletionItemKind.Enum,
+      //         insertText: 'NODE_ENV=production',
+      //         detail: 'Define the environment',
+      //         documentation: 'Can be set to development, production, or test.'
+      //       },
+      //       {
+      //         label: 'SIKIRU',
+      //         kind: monaco.languages.CompletionItemKind.Enum,
+      //         insertText: 'SIKIRU=production',
+      //         detail: 'Define my name',
+      //         documentation: 'Can be set to development, production, or test.'
+      //       }
+      //     ]
 
-    //     return {
-    //       suggestions: suggestions.map(s => ({
-    //         ...s,
-    //         range: new monaco.Range(
-    //           position.lineNumber,
-    //           model.getWordUntilPosition(position).startColumn,
-    //           position.lineNumber,
-    //           model.getWordUntilPosition(position).endColumn
-    //         )
-    //       }))
-    //     }
-    //   }
-    // })
+      //     return {
+      //       suggestions: suggestions.map(s => ({
+      //         ...s,
+      //         range: new monaco.Range(
+      //           position.lineNumber,
+      //           model.getWordUntilPosition(position).startColumn,
+      //           position.lineNumber,
+      //           model.getWordUntilPosition(position).endColumn
+      //         )
+      //       }))
+      //     }
+      //   }
+      // })
 
-    Object.keys(themes).forEach(theme => {
-      monaco.editor.defineTheme(theme, {
-        base: baseTheme, // 'vs-dark' for dark mode, 'vs' for light mode
-        inherit: true,
-        rules: [{ token: 'comment', foreground: commonThemeRules.comment }, ...themes[theme as keyof typeof themes]]
+      Object.keys(themes).forEach((theme) => {
+        monaco.editor.defineTheme(theme, {
+          base: baseTheme, // 'vs-dark' for dark mode, 'vs' for light mode
+          inherit: true,
+          rules: [
+            { token: 'comment', foreground: commonThemeRules.comment },
+            ...themes[theme as keyof typeof themes]
+          ]
+        })
       })
-    })
-  }, [isDark])
+    },
+    [isDark]
+  )
 
-  const beforeMount = useCallback((monaco: Monaco) => {
-    registerLanguagesAndThemes(monaco)
-    const selectedLang = getFileType()
-    setLanguage(selectedLang)
-  }, [registerLanguagesAndThemes, getFileType])
+  const beforeMount = useCallback(
+    (monaco: Monaco) => {
+      registerLanguagesAndThemes(monaco)
+      const selectedLang = getFileType()
+      setLanguage(selectedLang)
+    },
+    [registerLanguagesAndThemes, getFileType]
+  )
 
   const onMount = (editor: MonacoDiffEditor, monaco: Monaco) => {
     monacoRef.current = monaco
@@ -229,10 +269,10 @@ export default function DefaultEditor({
 
     // Add listener to capture selected text
     editor.onDidChangeCursorSelection(() => {
-      const selection = editor.getSelection();
-      const selectedText = editor.getModel().getValueInRange(selection);
-      setSelectedText({ text: selectedText, range: selection });
-    });
+      const selection = editor.getSelection()
+      const selectedText = editor.getModel().getValueInRange(selection)
+      setSelectedText({ text: selectedText, range: selection })
+    })
 
     if (!isAccessGrant) {
       editor.focus()
@@ -241,13 +281,13 @@ export default function DefaultEditor({
 
   const removeHighlight = () => {
     if (monacoRef.current) {
-      const editor = editorRef.current;
+      const editor = editorRef.current
       // Pass the current decoration IDs to remove the highlights
-      editor.deltaDecorations(decorationIds, []);
+      editor.deltaDecorations(decorationIds, [])
       // Clear the stored decoration IDs
-      setDecorationIds([]);
+      setDecorationIds([])
     }
-  };
+  }
 
   const addHighlight = (note: NoteDaum) => {
     if (monacoRef.current) {
@@ -258,20 +298,22 @@ export default function DefaultEditor({
         formatedRange.startColumn,
         formatedRange.endLineNumber,
         formatedRange.endColumn
-      );
+      )
       // Scroll to the note's range
-      editor.revealRangeInCenter(range); // Reveals the range in the center of the editor
+      editor.revealRangeInCenter(range) // Reveals the range in the center of the editor
       // Highlight the text using deltaDecorations
-      const newDecorationIds = editor.deltaDecorations([], [
-        {
-          range: range,
-          options: {
-            inlineClassName: 'highlighted-text',
-          },
-        },
-      ]);
-      setDecorationIds(newDecorationIds); // Store the decoration IDs
-
+      const newDecorationIds = editor.deltaDecorations(
+        [],
+        [
+          {
+            range: range,
+            options: {
+              inlineClassName: 'highlighted-text'
+            }
+          }
+        ]
+      )
+      setDecorationIds(newDecorationIds) // Store the decoration IDs
     }
   }
   const handleNoteClick = (note: NoteDaum, highlighted: boolean) => {
@@ -280,8 +322,7 @@ export default function DefaultEditor({
       return
     }
     addHighlight(note)
-  };
-
+  }
 
   useEffect(() => {
     if (isLockSuccess && !isLockError) {
@@ -295,7 +336,9 @@ export default function DefaultEditor({
   useEffect(() => {
     if (isSaveSuccess && !isSaveError) {
       setIsSubmitting(false)
-      toast(<Alert type="success" message={`Success! Changes Successfully Saved`} />)
+      toast(
+        <Alert type="success" message={`Success! Changes Successfully Saved`} />
+      )
     } else if (isSaveError) {
       setIsSubmitting(false)
     }
@@ -303,8 +346,7 @@ export default function DefaultEditor({
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-
-      <div className="col-span-2 border bg-neutral-bg border-neutral dark:bg-dark-neutral-bg dark:border-dark-neutral-border rounded-2xl pb-5 h-fit md:flex-1 xl:flex-none relative">
+      <div className="relative col-span-2 h-fit rounded-2xl border border-neutral bg-neutral-bg pb-5 md:flex-1 xl:flex-none dark:border-dark-neutral-border dark:bg-dark-neutral-bg">
         <Toolbar
           onRedo={handleRedo}
           onUndo={handleUndo}
@@ -319,12 +361,12 @@ export default function DefaultEditor({
           isProjectLocked={isProjectLocked}
           isSubmitting={isSubmitting}
         />
-        <div className='border-b border-neutral dark:border-dark-neutral-border' />
+        <div className="border-b border-neutral dark:border-dark-neutral-border" />
         <Editor
-          className="w-[900px] h-[700px]"
+          className="h-[600px] w-[900px]"
           language={language}
           value={maskData(value, isAccessGrant || isMasked)}
-          onChange={newValue => {
+          onChange={(newValue) => {
             /* TODO!: Write a function that validate the data structure.: We only want user to provide appropriate data structure specific to their project */
             setValue(newValue || '')
           }}
@@ -346,18 +388,20 @@ export default function DefaultEditor({
         />
       </div>
 
-      {/* Note */}
-      <NoteList
-        envId={envId}
-        environmentId={environmentId}
-        proId={proId}
-        projectId={projectId}
-        handleNoteClick={handleNoteClick}
-        setSelectedText={setSelectedText}
-        selectedText={selectedText}
-        isEnvLocked={isEnvLocked}
-        isProjectLocked={isProjectLocked}
-      />
+      <div className="">
+        <EditorSidebar
+          envId={envId}
+          environmentId={environmentId}
+          proId={proId}
+          projectId={projectId}
+          handleNoteClick={handleNoteClick}
+          setSelectedText={setSelectedText}
+          selectedText={selectedText}
+          isEnvLocked={isEnvLocked}
+          isProjectLocked={isProjectLocked}
+          isAccessGrant={isAccessGrant}
+        />
+      </div>
 
       {isAccessGrant && (
         <EditorDataProtection
@@ -370,6 +414,5 @@ export default function DefaultEditor({
         />
       )}
     </div>
-
   )
 }

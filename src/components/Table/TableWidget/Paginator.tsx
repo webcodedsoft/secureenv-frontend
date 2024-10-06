@@ -24,19 +24,21 @@ const Paginator: React.FC<PaginatorProps> = ({
   setNumberOfItemsPerPage,
   goToNextPage,
   goToPreviousPage,
-  showPageNumber = true,
+  showPageNumber = true
 }) => {
   return (
     <div className="flex w-full items-center justify-between">
       <div>
         {showPageNumber && (
-          <div className="flex items-center absolute gap-x-4">
-            <p className="text-[10px] font-medium text-gray-1100 dark:text-gray-dark-1100">Result(s) per page</p>
-            <div className="w-[45px] relative">
+          <div className="absolute z-50 flex items-center gap-x-4">
+            <p className="text-[10px] font-medium text-gray-1100 dark:text-gray-dark-1100">
+              Result(s) per page
+            </p>
+            <div className="relative w-[45px] ">
               <ResultsPerPageDropdown
                 selectedOption={{
                   label: numberOfItemsPerPage,
-                  value: numberOfItemsPerPage,
+                  value: numberOfItemsPerPage
                 }}
                 setSelectedOption={(option) => {
                   setNumberOfItemsPerPage(option.value)
@@ -59,9 +61,10 @@ const Paginator: React.FC<PaginatorProps> = ({
         <button
           type="button"
           className={clsx({
-            'border-none outline-none flex items-center text-[10px] font-medium': true,
+            'border-none outline-none flex items-center text-[10px] font-medium':
+              true,
             'text-gray-400 dark:text-gray-dark-400': !hasPrevious,
-            'text-[#C9CED1]': hasPrevious,
+            'text-[#C9CED1]': hasPrevious
           })}
           onClick={() => {
             goToPreviousPage()
@@ -69,8 +72,11 @@ const Paginator: React.FC<PaginatorProps> = ({
           disabled={!hasPrevious}
         >
           <div className="mr-2">
-            <Icon name={Icons.ArrowLeft} stroke={hasPrevious ? '#C9CED1' : '#273143'}
-              width={24} height={24}
+            <Icon
+              name={Icons.ArrowLeft}
+              stroke={hasPrevious ? '#C9CED1' : '#273143'}
+              width={24}
+              height={24}
             />
           </div>
           Prev
@@ -89,9 +95,10 @@ const Paginator: React.FC<PaginatorProps> = ({
         <button
           type="button"
           className={clsx({
-            'border-none outline-none flex items-center text-[10px] font-medium': true,
+            'border-none outline-none flex items-center text-[10px] font-medium':
+              true,
             'text-gray-400 dark:text-gray-dark-400': !hasNext,
-            'text-[#C9CED1]': hasNext,
+            'text-[#C9CED1]': hasNext
           })}
           onClick={() => {
             goToNextPage()
@@ -100,8 +107,12 @@ const Paginator: React.FC<PaginatorProps> = ({
         >
           Next
           <div className="ml-2">
-            <Icon name={Icons.ArrowRight} stroke={hasNext ? '#C9CED1' : '#273143'}
-              width={24} height={24} />
+            <Icon
+              name={Icons.ArrowRight}
+              stroke={hasNext ? '#C9CED1' : '#273143'}
+              width={24}
+              height={24}
+            />
           </div>
         </button>
       </div>

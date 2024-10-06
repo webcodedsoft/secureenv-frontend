@@ -45,7 +45,7 @@ export enum Icons {
   Locked = 'Locked',
   Shield = 'shield',
   Calendar = 'calendar',
-  Copy = "copy",
+  Copy = 'copy',
   EyeOpen = 'eye-open',
   EyeClose = 'eye-close',
   Upload = 'upload',
@@ -54,5 +54,8 @@ export enum Icons {
   Undo = 'undo',
   Redo = 'redo',
   Format = 'format',
-  Save = 'save'
+  Save = 'save',
+  Note = 'note',
+  Audit = 'audit',
+  Search = 'search'
 }

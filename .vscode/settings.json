@@ -43,7 +43,7 @@
   "editor.largeFileOptimizations": false,
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
-  "prettier.tabWidth": 2,
+  // "prettier.tabWidth": 2,
   "gitlens.views.repositories.files.layout": "auto",
   "editor.autoClosingBrackets": "always",
   "editor.autoClosingQuotes": "always",
@@ -52,29 +52,29 @@
   "autoimport.showNotifications": true,
   "css.lint.duplicateProperties": "error",
   "reactSnippets.settings.prettierEnabled": true,
-  "eslint.alwaysShowStatus": true,
-  "eslint.format.enable": true,
-  "eslint.lintTask.enable": true,
+  // "eslint.alwaysShowStatus": true,
+  // "eslint.format.enable": true,
+  // "eslint.lintTask.enable": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.fixAll": "explicit"
   },
   "emmet.triggerExpansionOnTab": true,
   "gitlens.gitCommands.closeOnFocusOut": true,
-  "prettier.trailingComma": "all",
-  "prettier.arrowParens": "avoid",
-  "prettier.bracketSpacing": true,
+  // "prettier.trailingComma": "all",
+  // "prettier.arrowParens": "avoid",
+  // "prettier.bracketSpacing": true,
   "diffEditor.ignoreTrimWhitespace": false,
-  "[scss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "eslint.run": "onSave",
-  "eslint.validate": [
-    "typescript",
-    "typescriptreact",
-    "javascript",
-    "javascriptreact"
-  ],
+  // "[scss]": {
+  //   "editor.defaultFormatter": "esbenp.prettier-vscode"
+  // },
+  // "eslint.run": "onSave",
+  // "eslint.validate": [
+  //   "typescript",
+  //   "typescriptreact",
+  //   "javascript",
+  //   "javascriptreact"
+  // ],
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "tailwindCSS.lint.cssConflict": "error",
@@ -88,14 +88,14 @@
   "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
   "typescript.preferences.quoteStyle": "single",
   "typescript.suggest.completeFunctionCalls": true,
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
+  // "[javascript]": {
+  //   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  //   "editor.formatOnSave": true
+  // },
+  // "[javascriptreact]": {
+  //   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  //   "editor.formatOnSave": true
+  // },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features",
     "editor.formatOnSave": true
@@ -109,5 +109,4 @@
   },
   "editor.language.brackets": [],
   "editor.indentSize": "tabSize",
-  "CodeGPT.apiKey": "CodeGPT Plus Beta",
 }

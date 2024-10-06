@@ -13,9 +13,13 @@ type IProps = {
   onClose: () => void
   repositoryUrl?: string
 }
-export default function EditProjectModal({ projectId, onClose, repositoryUrl }: IProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mutate, isSuccess, isError } = useEditProject();
+export default function EditProjectModal({
+  projectId,
+  onClose,
+  repositoryUrl
+}: IProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutate, isSuccess, isError } = useEditProject()
 
   const formik = useFormik({
     initialValues: {
@@ -23,7 +27,7 @@ export default function EditProjectModal({ projectId, onClose, repositoryUrl }: 
     },
     enableReinitialize: true,
     validationSchema: Yup.object({
-      repositoryUrl: Yup.string().nullable(),
+      repositoryUrl: Yup.string().nullable()
     }),
     onSubmit: (values, { setFieldTouched }) => {
       setIsSubmitting(true)
@@ -31,13 +35,18 @@ export default function EditProjectModal({ projectId, onClose, repositoryUrl }: 
         setFieldTouched(key, true)
       }
       mutate({ projectId: projectId, updateProjectDto: values })
-    },
+    }
   })
 
   useEffect(() => {
     if (isSuccess && !isError) {
       setIsSubmitting(false)
-      toast(<Alert type="success" message="Success! Project repository successfully changed!" />)
+      toast(
+        <Alert
+          type="success"
+          message="Success! Project repository successfully changed!"
+        />
+      )
       onClose()
     } else if (isError) {
       setIsSubmitting(false)
@@ -45,14 +54,17 @@ export default function EditProjectModal({ projectId, onClose, repositoryUrl }: 
   }, [isSuccess, isError])
 
   return (
-    <InfoModal width={`w-full max-w-[694px]`} className="h-fit mt-24 md:mt-0 rounded-lg pb-5 justify-centers flex w-full flex-col">
-      <div className="relative scrollbar-hide w-full max-w-3xl md:p-8 p-4 rounded-lg">
-        <div className="flex items-centers justify-centers flex-col">
+    <InfoModal
+      width={`w-full max-w-[694px]`}
+      className="justify-centers mt-24 flex h-fit w-full flex-col rounded-lg pb-5 md:mt-0"
+    >
+      <div className="relative w-full max-w-3xl rounded-lg p-4 scrollbar-hide md:p-8">
+        <div className="items-centers justify-centers flex flex-col">
           <h6 className="text-header-6 font-semibold text-gray-500 dark:text-gray-dark-500">
             Edit project
           </h6>
 
-          <form onSubmit={formik.handleSubmit} className='mt-7'>
+          <form onSubmit={formik.handleSubmit} className="mt-7">
             <div className="form-control mb-5">
               <TextField
                 name="repositoryUrl"
@@ -60,21 +72,25 @@ export default function EditProjectModal({ projectId, onClose, repositoryUrl }: 
                 label="Repository Url"
                 size="lg"
                 disabled={isSubmitting}
-                type='text'
+                type="text"
                 value={formik.values.repositoryUrl ?? ''}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched.repositoryUrl ? formik.errors.repositoryUrl : ''}
+                error={
+                  formik.touched.repositoryUrl
+                    ? formik.errors.repositoryUrl
+                    : ''
+                }
               />
             </div>
 
-            <div className='flex items-center justify-end mt-9'>
-              <div className='flex justify-end items-center gap-x-3'>
+            <div className="mt-9 flex items-center justify-end">
+              <div className="flex items-center justify-end gap-x-3">
                 <Button
                   type="button"
                   variant="outline"
                   size="md"
-                  className="rounded-md py-4 text-base dark:text-white w-fit"
+                  className="w-fit rounded-md py-4 text-base dark:text-white"
                   label="Cancel"
                   onClick={onClose}
                 ></Button>
@@ -83,7 +99,7 @@ export default function EditProjectModal({ projectId, onClose, repositoryUrl }: 
                   type="submit"
                   variant="primary"
                   size="md"
-                  className="rounded-md py-4 text-base text-white w-fit"
+                  className="w-fit rounded-md py-4 text-base text-white"
                   label="Save changes"
                   disabled={isSubmitting}
                   loading={isSubmitting}
